@@ -4163,7 +4163,16 @@ class Calculation
                             }
                             $this->debugLog->writeDebugLog('Evaluating Cell ', $cellRef, ' in worksheet ', $matches[2]);
                             if ($pCellParent !== null) {
-                                $cellSheet = $this->spreadsheet->getSheetByName($matches[2]);
+                                $worksheets = $this->spreadsheet->getAllSheets();
+
+                                $worksheetCount = count($worksheets);
+                                for ($i = 0; $i < $worksheetCount; ++$i) {
+                                    if ($worksheets[$i]->getTitle() === trim($pName, "'")) {
+                                        $cellSheet = $worksheets[$i];
+                                    }
+                                }
+                                
+                                // $cellSheet = $this->spreadsheet->getSheetByName($matches[2]);
                                 if ($cellSheet && $cellSheet->cellExists($cellRef)) {
                                     $cellValue = $this->extractCellRange($cellRef, $this->spreadsheet->getSheetByName($matches[2]), false);
                                     $pCell->attach($pCellParent);
