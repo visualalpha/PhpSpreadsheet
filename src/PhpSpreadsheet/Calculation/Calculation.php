@@ -4611,9 +4611,9 @@ class Calculation
                                 $worksheets = $this->spreadsheet->getAllSheets();
                                 $worksheetCount = count($worksheets);
                                 for ($i = 0; $i < $worksheetCount; ++$i) {
-                                  if ($worksheets[$i]->getTitle() === trim($matches[2], "'")) {
-                                      $cellSheet = $worksheets[$i];
-                                  }
+                                    if ($worksheets[$i]->getTitle() === trim($matches[2], "'")) {
+                                        $cellSheet = $worksheets[$i];
+                                    }
                                 }
                                 $cellSheet = $cellSheet ?? $this->spreadsheet->getSheetByName($matches[2]);
                                 if ($cellSheet && $cellSheet->cellExists($cellRef)) {
