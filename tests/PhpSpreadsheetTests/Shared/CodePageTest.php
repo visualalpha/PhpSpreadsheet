@@ -12,16 +12,33 @@ class CodePageTest extends TestCase
      * @dataProvider providerCodePage
      *
      * @param mixed $expectedResult
+     * @param mixed $codePageIndex
      */
-    public function testCodePageNumberToName($expectedResult, ...$args): void
+    public function testCodePageNumberToName($expectedResult, $codePageIndex): void
     {
-        $result = CodePage::numberToName(...$args);
+        $result = CodePage::numberToName($codePageIndex);
         self::assertEquals($expectedResult, $result);
     }
 
     public function providerCodePage()
     {
         return require 'tests/data/Shared/CodePage.php';
+    }
+
+    public function testCoverage(): void
+    {
+        $covered = [];
+        $expected = CodePage::getEncodings();
+        foreach ($expected as $key => $val) {
+            $covered[$key] = 0;
+        }
+        $tests = $this->providerCodePage();
+        foreach ($tests as $test) {
+            $covered[$test[1]] = 1;
+        }
+        foreach ($covered as $key => $val) {
+            self::assertEquals(1, $val, "Codepage $key not tested");
+        }
     }
 
     public function testNumberToNameWithInvalidCodePage(): void

@@ -2,9 +2,8 @@
 
 ![Logo](./assets/logo.svg)
 
-PhpSpreadsheet is a library written in pure PHP and providing a set of
-classes that allow you to read from and to write to different
-spreadsheet file formats, like Excel and LibreOffice Calc.
+PhpSpreadsheet is a library written in pure PHP and offers a set of classes that
+allow you to read and write various spreadsheet file formats such as Excel and LibreOffice Calc.
 
 ## File formats supported
 
@@ -90,7 +89,7 @@ php vendor/phpoffice/phpspreadsheet/samples/Basic/01_Simple.php
 
 ## Learn by documentation
 
-For more in-depth documentation, you may read about an [overview of the
+For more documentation in depth, you may read about an [overview of the
 architecture](./topics/architecture.md),
 [creating a spreadsheet](./topics/creating-spreadsheet.md),
 [worksheets](./topics/worksheets.md),
