@@ -4612,11 +4612,11 @@ class Calculation
 
                                 $worksheetCount = count($worksheets);
                                 for ($i = 0; $i < $worksheetCount; ++$i) {
-                                    if ($worksheets[$i]->getTitle() === trim($pName, "'")) {
-                                        $cellSheet = $worksheets[$i];
+                                    if ($worksheets[$i]->getTitle() === trim($matches[2], "'")) {
+                                        $cellSheet = $worksheets[$i] ?? $this->spreadsheet->getSheetByName($matches[2]);
                                     }
                                 }
-                                
+
                                 // $cellSheet = $this->spreadsheet->getSheetByName($matches[2]);
                                 if ($cellSheet && $cellSheet->cellExists($cellRef)) {
                                     $cellValue = $this->extractCellRange($cellRef, $this->spreadsheet->getSheetByName($matches[2]), false);
