@@ -2,27 +2,15 @@
 
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\TextData;
 
-use PhpOffice\PhpSpreadsheet\Calculation\Functions;
 use PhpOffice\PhpSpreadsheet\Calculation\TextData;
-use PhpOffice\PhpSpreadsheet\Shared\StringHelper;
+use PhpOffice\PhpSpreadsheet\Settings;
 use PHPUnit\Framework\TestCase;
 
 class RightTest extends TestCase
 {
-    protected function setUp(): void
-    {
-        Functions::setCompatibilityMode(Functions::COMPATIBILITY_EXCEL);
-        StringHelper::setDecimalSeparator('.');
-        StringHelper::setThousandsSeparator(',');
-        StringHelper::setCurrencyCode('$');
-    }
-
     protected function tearDown(): void
     {
-        Functions::setCompatibilityMode(Functions::COMPATIBILITY_EXCEL);
-        StringHelper::setDecimalSeparator('.');
-        StringHelper::setThousandsSeparator(',');
-        StringHelper::setCurrencyCode('$');
+        Settings::setLocale('en_US');
     }
 
     /**
@@ -39,5 +27,41 @@ class RightTest extends TestCase
     public function providerRIGHT()
     {
         return require 'tests/data/Calculation/TextData/RIGHT.php';
+    }
+
+    /**
+     * @dataProvider providerLocaleRIGHT
+     *
+     * @param string $expectedResult
+     * @param mixed $value
+     * @param mixed $locale
+     * @param mixed $characters
+     */
+    public function testLowerWithLocaleBoolean($expectedResult, $locale, $value, $characters): void
+    {
+        $newLocale = Settings::setLocale($locale);
+        if ($newLocale === false) {
+            Settings::setLocale('en_US');
+            self::markTestSkipped('Unable to set locale for locale-specific test');
+        }
+
+        $result = TextData::RIGHT($value, $characters);
+        self::assertEquals($expectedResult, $result);
+
+        Settings::setLocale('en_US');
+    }
+
+    public function providerLocaleRIGHT()
+    {
+        return [
+            ['RAI', 'fr_FR', true, 3],
+            ['AAR', 'nl_NL', true, 3],
+            ['OSI', 'fi', true, 3],
+            ['ИНА', 'bg', true, 3],
+            ['UX', 'fr_FR', false, 2],
+            ['WAAR', 'nl_NL', false, 4],
+            ['ÄTOSI', 'fi', false, 5],
+            ['ЖЬ', 'bg', false, 2],
+        ];
     }
 }

@@ -276,6 +276,19 @@ return [
         true,
     ],
     [
+        3,
+        3,
+        [
+            [
+                1,
+                2,
+                3,
+            ],
+        ],
+        1,
+        true,
+    ],
+    [
         5,
         'x',
         [
@@ -291,6 +304,26 @@ return [
         [
             ['Selection column', 'C', 'B', 'A'],
             ['Value to retrieve', 3, 2, 1],
+        ],
+        2,
+        false,
+    ],
+    [
+        '#VALUE!',
+        'B',
+        [
+            ['Selection column', 'C', 'B', 'A'],
+            ['Value to retrieve', 3, 2, 1],
+        ],
+        'Nan',
+        false,
+    ],
+    [
+        '#REF!',
+        'B',
+        [
+            'Selection column',
+            'Value to retrieve',
         ],
         2,
         false,
