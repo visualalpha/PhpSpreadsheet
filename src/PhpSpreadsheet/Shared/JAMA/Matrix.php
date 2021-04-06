@@ -457,17 +457,6 @@ class Matrix
     }
 
     /**
-     * uminus.
-     *
-     *    Unary minus matrix -A
-     *
-     * @return Matrix Unary minus matrix
-     */
-    public function uminus()
-    {
-    }
-
-    /**
      * plus.
      *
      *    A + B
@@ -1164,7 +1153,7 @@ class Matrix
      *
      * @return Matrix ... Solution if A is square, least squares solution otherwise
      */
-    public function solve($B)
+    public function solve(self $B)
     {
         if ($this->m == $this->n) {
             $LU = new LUDecomposition($this);
