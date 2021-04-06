@@ -2,24 +2,29 @@
 
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\DateTime;
 
-use PhpOffice\PhpSpreadsheet\Calculation\DateTimeExcel\Time;
+use PhpOffice\PhpSpreadsheet\Calculation\DateTime;
+use PhpOffice\PhpSpreadsheet\Calculation\Functions;
+use PhpOffice\PhpSpreadsheet\Shared\Date;
+use PHPUnit\Framework\TestCase;
 
-class TimeTest extends AllSetupTeardown
+class TimeTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        Functions::setCompatibilityMode(Functions::COMPATIBILITY_EXCEL);
+        Functions::setReturnDateType(Functions::RETURNDATE_EXCEL);
+        Date::setExcelCalendar(Date::CALENDAR_WINDOWS_1900);
+    }
+
     /**
      * @dataProvider providerTIME
      *
      * @param mixed $expectedResult
      */
-    public function testTIME($expectedResult, string $formula): void
+    public function testTIME($expectedResult, ...$args): void
     {
-        $this->mightHaveException($expectedResult);
-        $sheet = $this->sheet;
-        $sheet->getCell('B1')->setValue('15');
-        $sheet->getCell('B2')->setValue('32');
-        $sheet->getCell('B3')->setValue('50');
-        $sheet->getCell('A1')->setValue("=TIME($formula)");
-        self::assertEqualsWithDelta($expectedResult, $sheet->getCell('A1')->getCalculatedValue(), 1E-8);
+        $result = DateTime::TIME(...$args);
+        self::assertEqualsWithDelta($expectedResult, $result, 1E-8);
     }
 
     public function providerTIME()
@@ -29,35 +34,22 @@ class TimeTest extends AllSetupTeardown
 
     public function testTIMEtoUnixTimestamp(): void
     {
-        self::setUnixReturn();
+        Functions::setReturnDateType(Functions::RETURNDATE_PHP_NUMERIC);
 
-        $result = Time::funcTime(7, 30, 20);
+        $result = DateTime::TIME(7, 30, 20);
         self::assertEqualsWithDelta(27020, $result, 1E-8);
     }
 
     public function testTIMEtoDateTimeObject(): void
     {
-        self::setObjectReturn();
+        Functions::setReturnDateType(Functions::RETURNDATE_PHP_OBJECT);
 
-        $result = Time::funcTime(7, 30, 20);
+        $result = DateTime::TIME(7, 30, 20);
         //    Must return an object...
         self::assertIsObject($result);
         //    ... of the correct type
         self::assertTrue(is_a($result, 'DateTimeInterface'));
         //    ... with the correct value
         self::assertEquals($result->format('H:i:s'), '07:30:20');
-    }
-
-    public function testTIME1904(): void
-    {
-        self::setMac1904();
-        $result = Time::funcTime(0, 0, 0);
-        self::assertEquals(0, $result);
-    }
-
-    public function testTIME1900(): void
-    {
-        $result = Time::funcTime(0, 0, 0);
-        self::assertEquals(0, $result);
     }
 }

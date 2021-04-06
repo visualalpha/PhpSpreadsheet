@@ -2,15 +2,27 @@
 
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\TextData;
 
+use PhpOffice\PhpSpreadsheet\Calculation\Functions;
 use PhpOffice\PhpSpreadsheet\Calculation\TextData;
-use PhpOffice\PhpSpreadsheet\Settings;
+use PhpOffice\PhpSpreadsheet\Shared\StringHelper;
 use PHPUnit\Framework\TestCase;
 
 class LeftTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        Functions::setCompatibilityMode(Functions::COMPATIBILITY_EXCEL);
+        StringHelper::setDecimalSeparator('.');
+        StringHelper::setThousandsSeparator(',');
+        StringHelper::setCurrencyCode('$');
+    }
+
     protected function tearDown(): void
     {
-        Settings::setLocale('en_US');
+        Functions::setCompatibilityMode(Functions::COMPATIBILITY_EXCEL);
+        StringHelper::setDecimalSeparator('.');
+        StringHelper::setThousandsSeparator(',');
+        StringHelper::setCurrencyCode('$');
     }
 
     /**
@@ -27,41 +39,5 @@ class LeftTest extends TestCase
     public function providerLEFT()
     {
         return require 'tests/data/Calculation/TextData/LEFT.php';
-    }
-
-    /**
-     * @dataProvider providerLocaleLEFT
-     *
-     * @param string $expectedResult
-     * @param mixed $value
-     * @param mixed $locale
-     * @param mixed $characters
-     */
-    public function testLowerWithLocaleBoolean($expectedResult, $locale, $value, $characters): void
-    {
-        $newLocale = Settings::setLocale($locale);
-        if ($newLocale === false) {
-            Settings::setLocale('en_US');
-            self::markTestSkipped('Unable to set locale for locale-specific test');
-        }
-
-        $result = TextData::LEFT($value, $characters);
-        self::assertEquals($expectedResult, $result);
-
-        Settings::setLocale('en_US');
-    }
-
-    public function providerLocaleLEFT()
-    {
-        return [
-            ['VR', 'fr_FR', true, 2],
-            ['WA', 'nl_NL', true, 2],
-            ['TO', 'fi', true, 2],
-            ['ИСТ', 'bg', true, 3],
-            ['FA', 'fr_FR', false, 2],
-            ['ON', 'nl_NL', false, 2],
-            ['EPÄT', 'fi', false, 4],
-            ['ЛОЖ', 'bg', false, 3],
-        ];
     }
 }

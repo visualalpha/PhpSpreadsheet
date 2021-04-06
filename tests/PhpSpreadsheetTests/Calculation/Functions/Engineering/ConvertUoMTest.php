@@ -37,12 +37,6 @@ class ConvertUoMTest extends TestCase
         self::assertIsArray($result);
     }
 
-    public function testGetBinaryConversionMultipliers(): void
-    {
-        $result = Engineering::getBinaryConversionMultipliers();
-        self::assertIsArray($result);
-    }
-
     /**
      * @dataProvider providerCONVERTUOM
      *

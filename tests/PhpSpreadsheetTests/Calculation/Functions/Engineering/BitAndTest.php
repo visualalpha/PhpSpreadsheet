@@ -2,27 +2,26 @@
 
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\Engineering;
 
-use PhpOffice\PhpSpreadsheet\Calculation\Exception as CalcExp;
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Calculation\Engineering;
+use PhpOffice\PhpSpreadsheet\Calculation\Functions;
 use PHPUnit\Framework\TestCase;
 
 class BitAndTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        Functions::setCompatibilityMode(Functions::COMPATIBILITY_EXCEL);
+    }
+
     /**
      * @dataProvider providerBITAND
      *
      * @param mixed $expectedResult
+     * @param mixed[] $args
      */
-    public function testBITAND($expectedResult, string $formula): void
+    public function testBITAND($expectedResult, array $args): void
     {
-        if ($expectedResult === 'exception') {
-            $this->expectException(CalcExp::class);
-        }
-        $spreadsheet = new Spreadsheet();
-        $sheet = $spreadsheet->getActiveSheet();
-        $sheet->setCellValue('A2', 24);
-        $sheet->getCell('A1')->setValue("=BITAND($formula)");
-        $result = $sheet->getCell('A1')->getCalculatedValue();
+        $result = Engineering::BITAND(...$args);
         self::assertEquals($expectedResult, $result);
     }
 

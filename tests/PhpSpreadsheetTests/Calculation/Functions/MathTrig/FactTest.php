@@ -2,60 +2,31 @@
 
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\MathTrig;
 
-class FactTest extends AllSetupTeardown
+use PhpOffice\PhpSpreadsheet\Calculation\Functions;
+use PhpOffice\PhpSpreadsheet\Calculation\MathTrig;
+use PHPUnit\Framework\TestCase;
+
+class FactTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        Functions::setCompatibilityMode(Functions::COMPATIBILITY_EXCEL);
+    }
+
     /**
      * @dataProvider providerFACT
      *
      * @param mixed $expectedResult
-     * @param mixed $arg1
+     * @param $value
      */
-    public function testFACT($expectedResult, $arg1): void
+    public function testFACT($expectedResult, $value): void
     {
-        $this->mightHaveException($expectedResult);
-        $sheet = $this->sheet;
-        if ($arg1 !== null) {
-            $sheet->getCell('A1')->setValue($arg1);
-        }
-        if ($arg1 === 'omitted') {
-            $sheet->getCell('B1')->setValue('=FACT()');
-        } else {
-            $sheet->getCell('B1')->setValue('=FACT(A1)');
-        }
-        $result = $sheet->getCell('B1')->getCalculatedValue();
-        self::assertEquals($expectedResult, $result);
+        $result = MathTrig::FACT($value);
+        self::assertEqualsWithDelta($expectedResult, $result, 1E-12);
     }
 
     public function providerFACT()
     {
         return require 'tests/data/Calculation/MathTrig/FACT.php';
-    }
-
-    /**
-     * @dataProvider providerFACTGnumeric
-     *
-     * @param mixed $expectedResult
-     * @param mixed $arg1
-     */
-    public function testFACTGnumeric($expectedResult, $arg1): void
-    {
-        $this->mightHaveException($expectedResult);
-        self::setGnumeric();
-        $sheet = $this->sheet;
-        if ($arg1 !== null) {
-            $sheet->getCell('A1')->setValue($arg1);
-        }
-        if ($arg1 === 'omitted') {
-            $sheet->getCell('B1')->setValue('=FACT()');
-        } else {
-            $sheet->getCell('B1')->setValue('=FACT(A1)');
-        }
-        $result = $sheet->getCell('B1')->getCalculatedValue();
-        self::assertEquals($expectedResult, $result);
-    }
-
-    public function providerFACTGnumeric()
-    {
-        return require 'tests/data/Calculation/MathTrig/FACTGNUMERIC.php';
     }
 }

@@ -3,7 +3,6 @@
 namespace PhpOffice\PhpSpreadsheetTests\Functional;
 
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use PhpOffice\PhpSpreadsheet\Style\Alignment;
 
 class CommentsTest extends AbstractFunctional
 {
@@ -21,6 +20,8 @@ class CommentsTest extends AbstractFunctional
      * count of comments in correct coords.
      *
      * @dataProvider providerFormats
+     *
+     * @param $format
      */
     public function testComments($format): void
     {
@@ -34,22 +35,10 @@ class CommentsTest extends AbstractFunctional
 
         $reloadedSpreadsheet = $this->writeAndReload($spreadsheet, $format);
 
-        $sheet = $reloadedSpreadsheet->getSheet(0);
-        $commentsLoaded = $sheet->getComments();
+        $commentsLoaded = $reloadedSpreadsheet->getSheet(0)->getComments();
         self::assertCount(1, $commentsLoaded);
 
         $commentCoordinate = key($commentsLoaded);
         self::assertSame('E10', $commentCoordinate);
-        $comment = $commentsLoaded[$commentCoordinate];
-        self::assertEquals('Comment to test', (string) $comment);
-        $commentClone = clone $comment;
-        self::assertEquals($comment, $commentClone);
-        self::assertNotSame($comment, $commentClone);
-        if ($format === 'Xlsx') {
-            self::assertEquals('feb0c24b880a8130262dadf801f85e94', $comment->getHashCode());
-            self::assertEquals(Alignment::HORIZONTAL_GENERAL, $comment->getAlignment());
-            $comment->setAlignment(Alignment::HORIZONTAL_RIGHT);
-            self::assertEquals(Alignment::HORIZONTAL_RIGHT, $comment->getAlignment());
-        }
     }
 }

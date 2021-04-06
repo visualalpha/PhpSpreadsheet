@@ -1,15 +1,13 @@
 <?php
 
-use PhpOffice\PhpSpreadsheet\Reader\Csv as CsvReader;
-use PhpOffice\PhpSpreadsheet\Writer\Csv as CsvWriter;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 
 require __DIR__ . '/../Header.php';
 $spreadsheet = require __DIR__ . '/../templates/sampleSpreadsheet.php';
 
 $helper->log('Write to CSV format');
 /** @var \PhpOffice\PhpSpreadsheet\Writer\Csv $writer */
-$writer = new CsvWriter($spreadsheet);
-$writer->setDelimiter(',')
+$writer = IOFactory::createWriter($spreadsheet, 'Csv')->setDelimiter(',')
     ->setEnclosure('"')
     ->setSheetIndex(0);
 
@@ -21,15 +19,13 @@ $helper->logWrite($writer, $filename, $callStartTime);
 $helper->log('Read from CSV format');
 
 /** @var \PhpOffice\PhpSpreadsheet\Reader\Csv $reader */
-$reader = new CsvReader();
-$reader->setDelimiter(',')
+$reader = IOFactory::createReader('Csv')->setDelimiter(',')
     ->setEnclosure('"')
     ->setSheetIndex(0);
 
 $callStartTime = microtime(true);
 $spreadsheetFromCSV = $reader->load($filename);
 $helper->logRead('Csv', $filename, $callStartTime);
-unlink($filename);
 
 // Write Xlsx
 $helper->write($spreadsheetFromCSV, __FILE__, ['Xlsx']);
@@ -37,7 +33,7 @@ $helper->write($spreadsheetFromCSV, __FILE__, ['Xlsx']);
 // Write CSV
 $filenameCSV = $helper->getFilename(__FILE__, 'csv');
 /** @var \PhpOffice\PhpSpreadsheet\Writer\Csv $writerCSV */
-$writerCSV = new CsvWriter($spreadsheetFromCSV);
+$writerCSV = IOFactory::createWriter($spreadsheetFromCSV, 'Csv');
 $writerCSV->setExcelCompatibility(true);
 
 $callStartTime = microtime(true);

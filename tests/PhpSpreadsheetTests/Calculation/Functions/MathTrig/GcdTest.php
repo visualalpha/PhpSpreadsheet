@@ -2,8 +2,17 @@
 
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\MathTrig;
 
-class GcdTest extends AllSetupTeardown
+use PhpOffice\PhpSpreadsheet\Calculation\Functions;
+use PhpOffice\PhpSpreadsheet\Calculation\MathTrig;
+use PHPUnit\Framework\TestCase;
+
+class GcdTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        Functions::setCompatibilityMode(Functions::COMPATIBILITY_EXCEL);
+    }
+
     /**
      * @dataProvider providerGCD
      *
@@ -11,21 +20,7 @@ class GcdTest extends AllSetupTeardown
      */
     public function testGCD($expectedResult, ...$args): void
     {
-        $this->mightHaveException($expectedResult);
-        $sheet = $this->sheet;
-        $row = 0;
-        foreach ($args as $arg) {
-            ++$row;
-            if ($arg !== null) {
-                $sheet->getCell("A$row")->setValue($arg);
-            }
-        }
-        if ($row < 1) {
-            $sheet->getCell('B1')->setValue('=GCD()');
-        } else {
-            $sheet->getCell('B1')->setValue("=GCD(A1:A$row)");
-        }
-        $result = $sheet->getCell('B1')->getCalculatedValue();
+        $result = MathTrig::GCD(...$args);
         self::assertEqualsWithDelta($expectedResult, $result, 1E-12);
     }
 

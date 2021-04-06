@@ -135,8 +135,10 @@ class Axis extends Properties
      * Get Series Data Type.
      *
      * @param mixed $format_code
+     *
+     * @return string
      */
-    public function setAxisNumberProperties($format_code): void
+    public function setAxisNumberProperties($format_code)
     {
         $this->axisNumber['format'] = (string) $format_code;
         $this->axisNumber['source_linked'] = 0;
@@ -338,9 +340,9 @@ class Axis extends Properties
     {
         $this->setShadowPresetsProperties((int) $sh_presets)
             ->setShadowColor(
-                $sh_color_value ?? $this->shadowProperties['color']['value'],
-                $sh_color_alpha ?? (int) $this->shadowProperties['color']['alpha'],
-                $sh_color_type ?? $this->shadowProperties['color']['type']
+                $sh_color_value === null ? $this->shadowProperties['color']['value'] : $sh_color_value,
+                $sh_color_alpha === null ? (int) $this->shadowProperties['color']['alpha'] : $sh_color_alpha,
+                $sh_color_type === null ? $this->shadowProperties['color']['type'] : $sh_color_type
             )
             ->setShadowBlur($sh_blur)
             ->setShadowAngle($sh_angle)
@@ -365,7 +367,7 @@ class Axis extends Properties
     /**
      * Set Shadow Properties from Mapped Values.
      *
-     * @param mixed $reference
+     * @param mixed &$reference
      *
      * @return $this
      */
@@ -480,9 +482,9 @@ class Axis extends Properties
     {
         $this->setGlowSize($size)
             ->setGlowColor(
-                $color_value ?? $this->glowProperties['color']['value'],
-                $color_alpha ?? (int) $this->glowProperties['color']['alpha'],
-                $color_type ?? $this->glowProperties['color']['type']
+                $color_value === null ? $this->glowProperties['color']['value'] : $color_value,
+                $color_alpha === null ? (int) $this->glowProperties['color']['alpha'] : $color_alpha,
+                $color_type === null ? $this->glowProperties['color']['type'] : $color_type
             );
     }
 

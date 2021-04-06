@@ -5,8 +5,6 @@ namespace PhpOffice\PhpSpreadsheet;
 use PhpOffice\PhpSpreadsheet\Calculation\Calculation;
 use PhpOffice\PhpSpreadsheet\Chart\Renderer\IRenderer;
 use PhpOffice\PhpSpreadsheet\Collection\Memory;
-use Psr\Http\Client\ClientInterface;
-use Psr\Http\Message\RequestFactoryInterface;
 use Psr\SimpleCache\CacheInterface;
 
 class Settings
@@ -43,18 +41,6 @@ class Settings
      * @var CacheInterface
      */
     private static $cache;
-
-    /**
-     * The HTTP client implementation to be used for network request.
-     *
-     * @var null|ClientInterface
-     */
-    private static $httpClient;
-
-    /**
-     * @var null|RequestFactoryInterface
-     */
-    private static $requestFactory;
 
     /**
      * Set the locale code to use for formula translations and any special formatting.
@@ -169,50 +155,5 @@ class Settings
         }
 
         return self::$cache;
-    }
-
-    /**
-     * Set the HTTP client implementation to be used for network request.
-     */
-    public static function setHttpClient(ClientInterface $httpClient, RequestFactoryInterface $requestFactory): void
-    {
-        self::$httpClient = $httpClient;
-        self::$requestFactory = $requestFactory;
-    }
-
-    /**
-     * Unset the HTTP client configuration.
-     */
-    public static function unsetHttpClient(): void
-    {
-        self::$httpClient = null;
-        self::$requestFactory = null;
-    }
-
-    /**
-     * Get the HTTP client implementation to be used for network request.
-     */
-    public static function getHttpClient(): ClientInterface
-    {
-        self::assertHttpClient();
-
-        return self::$httpClient;
-    }
-
-    /**
-     * Get the HTTP request factory.
-     */
-    public static function getRequestFactory(): RequestFactoryInterface
-    {
-        self::assertHttpClient();
-
-        return self::$requestFactory;
-    }
-
-    private static function assertHttpClient(): void
-    {
-        if (!self::$httpClient || !self::$requestFactory) {
-            throw new Exception('HTTP client must be configured via Settings::setHttpClient() to be able to use WEBSERVICE function.');
-        }
     }
 }

@@ -11,11 +11,10 @@ class ColorTest extends TestCase
      * @dataProvider providerColorGetRed
      *
      * @param mixed $expectedResult
-     * @param mixed $color
      */
-    public function testGetRed($expectedResult, $color, ...$args): void
+    public function testGetRed($expectedResult, ...$args): void
     {
-        $result = Color::getRed($color, ...$args);
+        $result = Color::getRed(...$args);
         self::assertEquals($expectedResult, $result);
     }
 
@@ -28,11 +27,10 @@ class ColorTest extends TestCase
      * @dataProvider providerColorGetGreen
      *
      * @param mixed $expectedResult
-     * @param mixed $color
      */
-    public function testGetGreen($expectedResult, $color, ...$args): void
+    public function testGetGreen($expectedResult, ...$args): void
     {
-        $result = Color::getGreen($color, ...$args);
+        $result = Color::getGreen(...$args);
         self::assertEquals($expectedResult, $result);
     }
 
@@ -45,11 +43,10 @@ class ColorTest extends TestCase
      * @dataProvider providerColorGetBlue
      *
      * @param mixed $expectedResult
-     * @param mixed $color
      */
-    public function testGetBlue($expectedResult, $color, ...$args): void
+    public function testGetBlue($expectedResult, ...$args): void
     {
-        $result = Color::getBlue($color, ...$args);
+        $result = Color::getBlue(...$args);
         self::assertEquals($expectedResult, $result);
     }
 
@@ -72,22 +69,5 @@ class ColorTest extends TestCase
     public function providerColorChangeBrightness()
     {
         return require 'tests/data/Style/ColorChangeBrightness.php';
-    }
-
-    public function testDefaultColor(): void
-    {
-        $color = new Color();
-        $color->setARGB('FFFF0000');
-        self::assertEquals('FFFF0000', $color->getARGB());
-        self::assertEquals('FF0000', $color->getRGB());
-        $color->setARGB('');
-        self::assertEquals(Color::COLOR_BLACK, $color->getARGB());
-        self::assertEquals('000000', $color->getRGB());
-        $color->setARGB('FFFF0000');
-        self::assertEquals('FFFF0000', $color->getARGB());
-        self::assertEquals('FF0000', $color->getRGB());
-        $color->setRGB('');
-        self::assertEquals(Color::COLOR_BLACK, $color->getARGB());
-        self::assertEquals('000000', $color->getRGB());
     }
 }

@@ -2,7 +2,6 @@
 
 namespace PhpOffice\PhpSpreadsheet\Writer;
 
-use HTMLPurifier;
 use PhpOffice\PhpSpreadsheet\Calculation\Calculation;
 use PhpOffice\PhpSpreadsheet\Cell\Cell;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
@@ -133,13 +132,6 @@ class Html extends BaseWriter
     private $generateSheetNavigationBlock = true;
 
     /**
-     * Callback for editing generated html.
-     *
-     * @var null|callable
-     */
-    private $editHtmlCallback;
-
-    /**
      * Create a new HTML.
      */
     public function __construct(Spreadsheet $spreadsheet)
@@ -198,26 +190,11 @@ class Html extends BaseWriter
 
         // Write footer
         $html .= $this->generateHTMLFooter();
-        $callback = $this->editHtmlCallback;
-        if ($callback) {
-            $html = $callback($html);
-        }
 
         Calculation::setArrayReturnType($saveArrayReturnType);
         Calculation::getInstance($this->spreadsheet)->getDebugLog()->setWriteDebugLog($saveDebugLog);
 
         return $html;
-    }
-
-    /**
-     * Set a callback to edit the entire HTML.
-     *
-     * The callback must accept the HTML as string as first parameter,
-     * and it must return the edited HTML as string.
-     */
-    public function setEditHtmlCallback(?callable $callback): void
-    {
-        $this->editHtmlCallback = $callback;
     }
 
     const VALIGN_ARR = [
@@ -450,17 +427,22 @@ class Html extends BaseWriter
         foreach ($sheets as $sheet) {
             // Write table header
             $html .= $this->generateTableHeader($sheet);
-
             // Get worksheet dimension
-            [$min, $max] = explode(':', $sheet->calculateWorksheetDataDimension());
-            [$minCol, $minRow] = Coordinate::indexesFromString($min);
-            [$maxCol, $maxRow] = Coordinate::indexesFromString($max);
+            $dimension = explode(':', $sheet->calculateWorksheetDimension());
+            $dimension[0] = Coordinate::coordinateFromString($dimension[0]);
+            $dimension[0][0] = Coordinate::columnIndexFromString($dimension[0][0]);
+            $dimension[1] = Coordinate::coordinateFromString($dimension[1]);
+            $dimension[1][0] = Coordinate::columnIndexFromString($dimension[1][0]);
 
-            [$theadStart, $theadEnd, $tbodyStart] = $this->generateSheetStarts($sheet, $minRow);
+            // row min,max
+            $rowMin = $dimension[0][1];
+            $rowMax = $dimension[1][1];
+
+            [$theadStart, $theadEnd, $tbodyStart] = $this->generateSheetStarts($sheet, $rowMin);
 
             // Loop through cells
-            $row = $minRow - 1;
-            while ($row++ < $maxRow) {
+            $row = $rowMin - 1;
+            while ($row++ < $rowMax) {
                 [$cellType, $startTag, $endTag] = $this->generateSheetTags($row, $theadStart, $theadEnd, $tbodyStart);
                 $html .= $startTag;
 
@@ -469,8 +451,8 @@ class Html extends BaseWriter
                     // Start a new rowData
                     $rowData = [];
                     // Loop through columns
-                    $column = $minCol;
-                    while ($column <= $maxCol) {
+                    $column = $dimension[0][0];
+                    while ($column <= $dimension[1][0]) {
                         // Cell exists?
                         if ($sheet->cellExistsByColumnAndRow($column, $row)) {
                             $rowData[$column] = Coordinate::stringFromColumnIndex($column) . $row;
@@ -553,7 +535,7 @@ class Html extends BaseWriter
      *
      * @codeCoverageIgnore
      */
-    private function extendRowsForCharts(Worksheet $pSheet, int $row)
+    private function extendRowsForCharts(Worksheet $pSheet, $row)
     {
         $rowMax = $row;
         $colMax = 'A';
@@ -578,7 +560,7 @@ class Html extends BaseWriter
         return [$rowMax, $colMax, $anyfound];
     }
 
-    private function extendRowsForChartsAndImages(Worksheet $pSheet, int $row): string
+    private function extendRowsForChartsAndImages(Worksheet $pSheet, $row)
     {
         [$rowMax, $colMax, $anyfound] = $this->extendRowsForCharts($pSheet, $row);
 
@@ -1165,7 +1147,7 @@ class Html extends BaseWriter
      * Generate table header.
      *
      * @param Worksheet $pSheet The worksheet for the table we are writing
-     * @param bool $showid whether or not to add id to table tag
+     * @param bool   $showid whether or not to add id to table tag
      *
      * @return string
      */
@@ -1178,6 +1160,8 @@ class Html extends BaseWriter
         $id = $showid ? "id='sheet$sheetIndex'" : '';
         if ($showid) {
             $html .= "<div style='page: page$sheetIndex'>\n";
+        //} elseif ($this->useInlineCss) {
+        //    $html .= "<div style='page-break-before: always' ></div>\n";
         } else {
             $html .= "<div style='page: page$sheetIndex' class='scrpgbrk'>\n";
         }
@@ -1321,7 +1305,7 @@ class Html extends BaseWriter
                 [$this, 'formatColor']
             );
             if ($cellData === $origData) {
-                $cellData = htmlspecialchars($cellData ?? '');
+                $cellData = htmlspecialchars($cellData);
             }
             if ($pSheet->getParent()->getCellXfByIndex($cell->getXfIndex())->getFont()->getSuperscript()) {
                 $cellData = '<sup>' . $cellData . '</sup>';
@@ -1367,8 +1351,7 @@ class Html extends BaseWriter
 
                 // General horizontal alignment: Actual horizontal alignment depends on dataType
                 $sharedStyle = $pSheet->getParent()->getCellXfByIndex($cell->getXfIndex());
-                if (
-                    $sharedStyle->getAlignment()->getHorizontal() == Alignment::HORIZONTAL_GENERAL
+                if ($sharedStyle->getAlignment()->getHorizontal() == Alignment::HORIZONTAL_GENERAL
                     && isset($this->cssStyles['.' . $cell->getDataType()]['text-align'])
                 ) {
                     $cssClass['text-align'] = $this->cssStyles['.' . $cell->getDataType()]['text-align'];
@@ -1616,11 +1599,11 @@ class Html extends BaseWriter
     /**
      * Get use embedded CSS?
      *
+     * @deprecated no longer used
+     *
      * @return bool
      *
      * @codeCoverageIgnore
-     *
-     * @deprecated no longer used
      */
     public function getUseEmbeddedCSS()
     {
@@ -1630,13 +1613,13 @@ class Html extends BaseWriter
     /**
      * Set use embedded CSS?
      *
+     * @deprecated no longer used
+     *
      * @param bool $pValue
      *
      * @return $this
      *
      * @codeCoverageIgnore
-     *
-     * @deprecated no longer used
      */
     public function setUseEmbeddedCSS($pValue)
     {
@@ -1701,11 +1684,11 @@ class Html extends BaseWriter
                 $first = $cells[0];
                 $last = $cells[1];
 
-                [$fc, $fr] = Coordinate::indexesFromString($first);
-                $fc = $fc - 1;
+                [$fc, $fr] = Coordinate::coordinateFromString($first);
+                $fc = Coordinate::columnIndexFromString($fc) - 1;
 
-                [$lc, $lr] = Coordinate::indexesFromString($last);
-                $lc = $lc - 1;
+                [$lc, $lr] = Coordinate::coordinateFromString($last);
+                $lc = Coordinate::columnIndexFromString($lc) - 1;
 
                 // loop through the individual cells in the individual merge
                 $r = $fr - 1;
@@ -1787,13 +1770,9 @@ class Html extends BaseWriter
     {
         $result = '';
         if (!$this->isPdf && isset($pSheet->getComments()[$coordinate])) {
-            $sanitizer = new HTMLPurifier();
-            $sanitizedString = $sanitizer->purify($pSheet->getComment($coordinate)->getText()->getPlainText());
-            if ($sanitizedString !== '') {
-                $result .= '<a class="comment-indicator"></a>';
-                $result .= '<div class="comment">' . nl2br($sanitizedString) . '</div>';
-                $result .= PHP_EOL;
-            }
+            $result .= '<a class="comment-indicator"></a>';
+            $result .= '<div class="comment">' . nl2br($pSheet->getComment($coordinate)->getText()->getPlainText()) . '</div>';
+            $result .= PHP_EOL;
         }
 
         return $result;

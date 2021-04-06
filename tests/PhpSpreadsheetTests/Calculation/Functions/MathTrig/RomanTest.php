@@ -2,21 +2,25 @@
 
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\MathTrig;
 
-class RomanTest extends AllSetupTeardown
+use PhpOffice\PhpSpreadsheet\Calculation\Functions;
+use PhpOffice\PhpSpreadsheet\Calculation\MathTrig;
+use PHPUnit\Framework\TestCase;
+
+class RomanTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        Functions::setCompatibilityMode(Functions::COMPATIBILITY_EXCEL);
+    }
+
     /**
      * @dataProvider providerROMAN
      *
      * @param mixed $expectedResult
-     * @param mixed $formula
      */
-    public function testROMAN($expectedResult, $formula): void
+    public function testROMAN($expectedResult, ...$args): void
     {
-        $this->mightHaveException($expectedResult);
-        $sheet = $this->sheet;
-        $sheet->setCellValue('A3', 49);
-        $sheet->getCell('A1')->setValue("=ROMAN($formula)");
-        $result = $sheet->getCell('A1')->getCalculatedValue();
+        $result = MathTrig::ROMAN(...$args);
         self::assertEquals($expectedResult, $result);
     }
 

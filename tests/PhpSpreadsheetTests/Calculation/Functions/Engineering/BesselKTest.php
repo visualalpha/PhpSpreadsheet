@@ -8,7 +8,7 @@ use PHPUnit\Framework\TestCase;
 
 class BesselKTest extends TestCase
 {
-    const BESSEL_PRECISION = 1E-12;
+    const BESSEL_PRECISION = 1E-8;
 
     protected function setUp(): void
     {

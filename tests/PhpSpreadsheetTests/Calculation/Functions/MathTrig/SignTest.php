@@ -2,24 +2,27 @@
 
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\MathTrig;
 
-class SignTest extends AllSetupTeardown
+use PhpOffice\PhpSpreadsheet\Calculation\Functions;
+use PhpOffice\PhpSpreadsheet\Calculation\MathTrig;
+use PHPUnit\Framework\TestCase;
+
+class SignTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        Functions::setCompatibilityMode(Functions::COMPATIBILITY_EXCEL);
+    }
+
     /**
      * @dataProvider providerSIGN
      *
      * @param mixed $expectedResult
-     * @param mixed $value
+     * @param $value
      */
     public function testSIGN($expectedResult, $value): void
     {
-        $this->mightHaveException($expectedResult);
-        $sheet = $this->sheet;
-        $sheet->setCellValue('A2', 1.3);
-        $sheet->setCellValue('A3', 0);
-        $sheet->setCellValue('A4', -3.8);
-        $sheet->getCell('A1')->setValue("=SIGN($value)");
-        $result = $sheet->getCell('A1')->getCalculatedValue();
-        self::assertEquals($expectedResult, $result);
+        $result = MathTrig::SIGN($value);
+        self::assertEqualsWithDelta($expectedResult, $result, 1E-12);
     }
 
     public function providerSIGN()

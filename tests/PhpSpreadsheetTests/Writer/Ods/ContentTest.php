@@ -59,7 +59,6 @@ class ContentTest extends TestCase
 
         $worksheet1->setCellValue('A2', true); // Boolean
         $worksheet1->setCellValue('B2', false); // Boolean
-
         $worksheet1->setCellValueExplicit(
             'C2',
             '=IF(A3, CONCATENATE(A1, " ", A2), CONCATENATE(A2, " ", A1))',
@@ -70,9 +69,6 @@ class ContentTest extends TestCase
         $worksheet1->getStyle('D2')
             ->getNumberFormat()
             ->setFormatCode(NumberFormat::FORMAT_DATE_DATETIME);
-
-        $worksheet1->setCellValueExplicit('F1', null, DataType::TYPE_ERROR);
-        $worksheet1->setCellValueExplicit('G1', 'Lorem ipsum', DataType::TYPE_INLINE);
 
         // Styles
         $worksheet1->getStyle('A1')->getFont()->setBold(true);

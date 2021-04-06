@@ -17,7 +17,7 @@ class FisherTest extends TestCase
      * @dataProvider providerFISHER
      *
      * @param mixed $expectedResult
-     * @param mixed $value
+     * @param $value
      */
     public function testFISHER($expectedResult, $value): void
     {

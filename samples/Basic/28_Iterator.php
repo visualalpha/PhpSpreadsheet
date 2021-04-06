@@ -1,22 +1,21 @@
 <?php
 
-use PhpOffice\PhpSpreadsheet\Reader\Xlsx as XLsxReader;
-use PhpOffice\PhpSpreadsheet\Writer\Xlsx as XLsxWriter;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 require __DIR__ . '/../Header.php';
 
 $sampleSpreadsheet = require __DIR__ . '/../templates/sampleSpreadsheet.php';
 $filename = $helper->getTemporaryFilename();
-$writer = new XlsxWriter($sampleSpreadsheet);
+$writer = new Xlsx($sampleSpreadsheet);
 $callStartTime = microtime(true);
 $writer->save($filename);
 $helper->logWrite($writer, $filename, $callStartTime);
 
 $callStartTime = microtime(true);
-$reader = new XlsxReader();
+$reader = IOFactory::createReader('Xlsx');
 $spreadsheet = $reader->load($filename);
 $helper->logRead('Xlsx', $filename, $callStartTime);
-unlink($filename);
 $helper->log('Iterate worksheets');
 foreach ($spreadsheet->getWorksheetIterator() as $worksheet) {
     $helper->log('Worksheet - ' . $worksheet->getTitle());

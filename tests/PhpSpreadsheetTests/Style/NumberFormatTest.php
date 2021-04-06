@@ -8,26 +8,10 @@ use PHPUnit\Framework\TestCase;
 
 class NumberFormatTest extends TestCase
 {
-    private $currencyCode;
-
-    private $decimalSeparator;
-
-    private $thousandsSeparator;
-
     protected function setUp(): void
     {
-        $this->currencyCode = StringHelper::getCurrencyCode();
-        $this->decimalSeparator = StringHelper::getDecimalSeparator();
-        $this->thousandsSeparator = StringHelper::getThousandsSeparator();
         StringHelper::setDecimalSeparator('.');
         StringHelper::setThousandsSeparator(',');
-    }
-
-    protected function tearDown(): void
-    {
-        StringHelper::setCurrencyCode($this->currencyCode);
-        StringHelper::setDecimalSeparator($this->decimalSeparator);
-        StringHelper::setThousandsSeparator($this->thousandsSeparator);
     }
 
     /**

@@ -105,7 +105,7 @@ class CsvTest extends TestCase
     {
         return [
             [false, 'tests/data/Reader/Ods/data.ods'],
-            [false, 'samples/templates/excel2003.xml'],
+            [false, 'tests/data/Reader/Xml/WithoutStyle.xml'],
             [true, 'tests/data/Reader/CSV/enclosure.csv'],
             [true, 'tests/data/Reader/CSV/semicolon_separated.csv'],
             [true, 'tests/data/Reader/CSV/contains_html.csv'],
@@ -200,37 +200,6 @@ EOF;
         self::assertEquals($expected, $sheet->getCell('B3')->getValue());
     }
 
-    public function testLineBreakEscape(): void
-    {
-        $reader = new Csv();
-        $spreadsheet = $reader->load('tests/data/Reader/CSV/line_break_in_enclosure_with_escaped_quotes.csv');
-        $sheet = $spreadsheet->getActiveSheet();
-        $expected = <<<EOF
-This is a "test csv file"
-with both "line breaks"
-and "escaped
-quotes" that breaks
-the delimiters
-EOF;
-        self::assertEquals($expected, $sheet->getCell('B3')->getValue());
-    }
-
-    public function testUtf32LineBreakEscape(): void
-    {
-        $reader = new Csv();
-        $reader->setInputEncoding('UTF-32LE');
-        $spreadsheet = $reader->load('tests/data/Reader/CSV/line_break_escaped_32le.csv');
-        $sheet = $spreadsheet->getActiveSheet();
-        $expected = <<<EOF
-This is a "test csv file"
-with both "line breaks"
-and "escaped
-quotes" that breaks
-the delimiters
-EOF;
-        self::assertEquals($expected, $sheet->getCell('B3')->getValue());
-    }
-
     public function testSeparatorLine(): void
     {
         $reader = new Csv();
@@ -255,10 +224,6 @@ EOF;
         self::assertEquals('\'', $reader->getEnclosure());
         $reader->setEnclosure('');
         self::assertEquals('"', $reader->getEnclosure());
-        // following tests from BaseReader
-        self::assertTrue($reader->getReadEmptyCells());
-        self::assertFalse($reader->getIncludeCharts());
-        self::assertNull($reader->getLoadSheetsOnly());
     }
 
     public function testReadEmptyFileName(): void
@@ -274,67 +239,5 @@ EOF;
         $this->expectException(ReaderException::class);
         $reader = new Csv();
         $reader->load('tests/data/Reader/CSV/encoding.utf8.csvxxx');
-    }
-
-    /**
-     * @dataProvider providerEscapes
-     */
-    public function testInferSeparator(string $escape, string $delimiter): void
-    {
-        $reader = new Csv();
-        $reader->setEscapeCharacter($escape);
-        $filename = 'tests/data/Reader/CSV/escape.csv';
-        $reader->listWorksheetInfo($filename);
-        self::assertEquals($delimiter, $reader->getDelimiter());
-    }
-
-    public function providerEscapes()
-    {
-        return [
-            ['\\', ';'],
-            ["\x0", ','],
-            [(version_compare(PHP_VERSION, '7.4') < 0) ? "\x0" : '', ','],
-        ];
-    }
-
-    /**
-     * @dataProvider providerGuessEncoding
-     */
-    public function testGuessEncoding(string $filename): void
-    {
-        $reader = new Csv();
-        $reader->setInputEncoding(Csv::guessEncoding($filename));
-        $spreadsheet = $reader->load($filename);
-        $sheet = $spreadsheet->getActiveSheet();
-        self::assertEquals('première', $sheet->getCell('A1')->getValue());
-        self::assertEquals('sixième', $sheet->getCell('C2')->getValue());
-    }
-
-    public function providerGuessEncoding()
-    {
-        return [
-            ['tests/data/Reader/CSV/premiere.utf8.csv'],
-            ['tests/data/Reader/CSV/premiere.utf8bom.csv'],
-            ['tests/data/Reader/CSV/premiere.utf16be.csv'],
-            ['tests/data/Reader/CSV/premiere.utf16bebom.csv'],
-            ['tests/data/Reader/CSV/premiere.utf16le.csv'],
-            ['tests/data/Reader/CSV/premiere.utf16lebom.csv'],
-            ['tests/data/Reader/CSV/premiere.utf32be.csv'],
-            ['tests/data/Reader/CSV/premiere.utf32bebom.csv'],
-            ['tests/data/Reader/CSV/premiere.utf32le.csv'],
-            ['tests/data/Reader/CSV/premiere.utf32lebom.csv'],
-            ['tests/data/Reader/CSV/premiere.win1252.csv'],
-        ];
-    }
-
-    public function testGuessEncodingDefltIso2(): void
-    {
-        $filename = 'tests/data/Reader/CSV/premiere.win1252.csv';
-        $reader = new Csv();
-        $reader->setInputEncoding(Csv::guessEncoding($filename, 'ISO-8859-2'));
-        $spreadsheet = $reader->load($filename);
-        $sheet = $spreadsheet->getActiveSheet();
-        self::assertEquals('premičre', $sheet->getCell('A1')->getValue());
-        self::assertEquals('sixičme', $sheet->getCell('C2')->getValue());
     }
 }

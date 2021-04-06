@@ -15,6 +15,8 @@ class ColumnWidthTest extends AbstractFunctional
 
     /**
      * @dataProvider providerFormats
+     *
+     * @param $format
      */
     public function testReadColumnWidth($format): void
     {

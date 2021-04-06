@@ -2,8 +2,17 @@
 
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\MathTrig;
 
-class ProductTest extends AllSetupTeardown
+use PhpOffice\PhpSpreadsheet\Calculation\Functions;
+use PhpOffice\PhpSpreadsheet\Calculation\MathTrig;
+use PHPUnit\Framework\TestCase;
+
+class ProductTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        Functions::setCompatibilityMode(Functions::COMPATIBILITY_EXCEL);
+    }
+
     /**
      * @dataProvider providerPRODUCT
      *
@@ -11,14 +20,7 @@ class ProductTest extends AllSetupTeardown
      */
     public function testPRODUCT($expectedResult, ...$args): void
     {
-        $sheet = $this->sheet;
-        $row = 0;
-        foreach ($args as $arg) {
-            ++$row;
-            $sheet->getCell("A$row")->setValue($arg);
-        }
-        $sheet->getCell('B1')->setValue("=PRODUCT(A1:A$row)");
-        $result = $sheet->getCell('B1')->getCalculatedValue();
+        $result = MathTrig::PRODUCT(...$args);
         self::assertEqualsWithDelta($expectedResult, $result, 1E-12);
     }
 

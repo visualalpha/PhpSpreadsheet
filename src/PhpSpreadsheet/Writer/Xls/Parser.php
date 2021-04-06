@@ -2,9 +2,7 @@
 
 namespace PhpOffice\PhpSpreadsheet\Writer\Xls;
 
-use PhpOffice\PhpSpreadsheet\Calculation\Calculation;
 use PhpOffice\PhpSpreadsheet\Shared\StringHelper;
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet as PhpspreadsheetWorksheet;
 use PhpOffice\PhpSpreadsheet\Writer\Exception as WriterException;
 
@@ -80,7 +78,7 @@ class Parser
      *
      * @var string
      */
-    public $parseTree;
+    private $parseTree;
 
     /**
      * Array of external sheets.
@@ -469,15 +467,11 @@ class Parser
         'BAHTTEXT' => [368, 1, 0, 0],
     ];
 
-    private $spreadsheet;
-
     /**
      * The class constructor.
      */
-    public function __construct(Spreadsheet $spreadsheet)
+    public function __construct()
     {
-        $this->spreadsheet = $spreadsheet;
-
         $this->currentCharacter = 0;
         $this->currentToken = ''; // The token we are working on.
         $this->formula = ''; // The formula to parse.
@@ -524,14 +518,12 @@ class Parser
         // match error codes
         } elseif (preg_match('/^#[A-Z0\\/]{3,5}[!?]{1}$/', $token) || $token == '#N/A') {
             return $this->convertError($token);
-        } elseif (preg_match('/^' . Calculation::CALCULATION_REGEXP_DEFINEDNAME . '$/mui', $token) && $this->spreadsheet->getDefinedName($token) !== null) {
-            return $this->convertDefinedName($token);
         // commented so argument number can be processed correctly. See toReversePolish().
-            /*elseif (preg_match("/[A-Z0-9\xc0-\xdc\.]+/", $token))
-            {
-                return($this->convertFunction($token, $this->_func_args));
-            }*/
-            // if it's an argument, ignore the token (the argument remains)
+        /*elseif (preg_match("/[A-Z0-9\xc0-\xdc\.]+/", $token))
+        {
+            return($this->convertFunction($token, $this->_func_args));
+        }*/
+        // if it's an argument, ignore the token (the argument remains)
         } elseif ($token == 'arg') {
             return '';
         }
@@ -597,9 +589,10 @@ class Parser
         if ($args >= 0) {
             return pack('Cv', $this->ptg['ptgFuncV'], $this->functions[$token][0]);
         }
-
         // Variable number of args eg. SUM($i, $j, $k, ..).
-        return pack('CCv', $this->ptg['ptgFuncVarV'], $num_args, $this->functions[$token][0]);
+        if ($args == -1) {
+            return pack('CCv', $this->ptg['ptgFuncVarV'], $num_args, $this->functions[$token][0]);
+        }
     }
 
     /**
@@ -746,27 +739,6 @@ class Parser
         return pack('C', 0xFF);
     }
 
-    private function convertDefinedName(string $name): string
-    {
-        if (strlen($name) > 255) {
-            throw new WriterException('Defined Name is too long');
-        }
-
-        $nameReference = 1;
-        foreach ($this->spreadsheet->getDefinedNames() as $definedName) {
-            if ($name === $definedName->getName()) {
-                break;
-            }
-            ++$nameReference;
-        }
-
-        $ptgRef = pack('Cvxx', $this->ptg['ptgName'], $nameReference);
-
-        throw new WriterException('Cannot yet write formulae with defined names to Xls');
-
-        return $ptgRef;
-    }
-
     /**
      * Look up the REF index that corresponds to an external sheet name
      * (or range). If it doesn't exist yet add it to the workbook's references
@@ -851,10 +823,10 @@ class Parser
      * called by the addWorksheet() method of the
      * \PhpOffice\PhpSpreadsheet\Writer\Xls\Workbook class.
      *
+     * @see \PhpOffice\PhpSpreadsheet\Writer\Xls\Workbook::addWorksheet()
+     *
      * @param string $name The name of the worksheet being added
      * @param int $index The index of the worksheet being added
-     *
-     * @see \PhpOffice\PhpSpreadsheet\Writer\Xls\Workbook::addWorksheet()
      */
     public function setExtSheet($name, $index): void
     {
@@ -968,7 +940,6 @@ class Parser
      */
     private function advance()
     {
-        $token = '';
         $i = $this->currentCharacter;
         $formula_length = strlen($this->formula);
         // eat up white spaces
@@ -1084,8 +1055,6 @@ class Parser
                     return $token;
                 } elseif (preg_match("/^[A-Z0-9\xc0-\xdc\\.]+$/i", $token) && ($this->lookAhead === '(')) {
                     // if it's a function call
-                    return $token;
-                } elseif (preg_match('/^' . Calculation::CALCULATION_REGEXP_DEFINEDNAME . '$/miu', $token) && $this->spreadsheet->getDefinedName($token) !== null) {
                     return $token;
                 } elseif (substr($token, -1) === ')') {
                     //    It's an argument of some description (e.g. a named range),
@@ -1203,11 +1172,9 @@ class Parser
             return $this->createTree('ptgUplus', $result2, '');
         }
         $result = $this->term();
-        while (
-            ($this->currentToken == '+') ||
-            ($this->currentToken == '-') ||
-            ($this->currentToken == '^')
-        ) {
+        while (($this->currentToken == '+') ||
+               ($this->currentToken == '-') ||
+               ($this->currentToken == '^')) {
             if ($this->currentToken == '+') {
                 $this->advance();
                 $result2 = $this->term();
@@ -1230,9 +1197,9 @@ class Parser
      * This function just introduces a ptgParen element in the tree, so that Excel
      * doesn't get confused when working with a parenthesized formula afterwards.
      *
-     * @return array The parsed ptg'd tree
-     *
      * @see fact()
+     *
+     * @return array The parsed ptg'd tree
      */
     private function parenthesizedExpression()
     {
@@ -1248,10 +1215,8 @@ class Parser
     private function term()
     {
         $result = $this->fact();
-        while (
-            ($this->currentToken == '*') ||
-            ($this->currentToken == '/')
-        ) {
+        while (($this->currentToken == '*') ||
+               ($this->currentToken == '/')) {
             if ($this->currentToken == '*') {
                 $this->advance();
                 $result2 = $this->fact();
@@ -1285,7 +1250,6 @@ class Parser
                 throw new WriterException("')' token expected.");
             }
             $this->advance(); // eat the ")"
-
             return $result;
         }
         // if it's a reference
@@ -1306,10 +1270,8 @@ class Parser
             $this->advance();
 
             return $result;
-        } elseif (
-            preg_match('/^(\$)?[A-Ia-i]?[A-Za-z](\$)?\d+:(\$)?[A-Ia-i]?[A-Za-z](\$)?\d+$/', $this->currentToken) ||
-            preg_match('/^(\$)?[A-Ia-i]?[A-Za-z](\$)?\d+\.\.(\$)?[A-Ia-i]?[A-Za-z](\$)?\d+$/', $this->currentToken)
-        ) {
+        } elseif (preg_match('/^(\$)?[A-Ia-i]?[A-Za-z](\$)?\d+:(\$)?[A-Ia-i]?[A-Za-z](\$)?\d+$/', $this->currentToken) ||
+                preg_match('/^(\$)?[A-Ia-i]?[A-Za-z](\$)?\d+\.\.(\$)?[A-Ia-i]?[A-Za-z](\$)?\d+$/', $this->currentToken)) {
             // if it's a range A1:B2 or $A$1:$B$2
             // must be an error?
             $result = $this->createTree($this->currentToken, '', '');
@@ -1341,14 +1303,9 @@ class Parser
             $this->advance();
 
             return $result;
-        } elseif (preg_match("/^[A-Z0-9\xc0-\xdc\\.]+$/i", $this->currentToken) && ($this->lookAhead === '(')) {
+        } elseif (preg_match("/^[A-Z0-9\xc0-\xdc\\.]+$/i", $this->currentToken)) {
             // if it's a function call
             return $this->func();
-        } elseif (preg_match('/^' . Calculation::CALCULATION_REGEXP_DEFINEDNAME . '$/miu', $this->currentToken) && $this->spreadsheet->getDefinedName($this->currentToken) !== null) {
-            $result = $this->createTree('ptgName', $this->currentToken, '');
-            $this->advance();
-
-            return $result;
         }
 
         throw new WriterException('Syntax error: ' . $this->currentToken . ', lookahead: ' . $this->lookAhead . ', current char: ' . $this->currentCharacter);
@@ -1393,7 +1350,6 @@ class Parser
 
         $result = $this->createTree($function, $result, $num_args);
         $this->advance(); // eat the ")"
-
         return $result;
     }
 
@@ -1461,20 +1417,17 @@ class Parser
             $polish .= $converted_tree;
         }
         // if it's a function convert it here (so we can set it's arguments)
-        if (
-            preg_match("/^[A-Z0-9\xc0-\xdc\\.]+$/", $tree['value']) &&
+        if (preg_match("/^[A-Z0-9\xc0-\xdc\\.]+$/", $tree['value']) &&
             !preg_match('/^([A-Ia-i]?[A-Za-z])(\d+)$/', $tree['value']) &&
             !preg_match('/^[A-Ia-i]?[A-Za-z](\\d+)\\.\\.[A-Ia-i]?[A-Za-z](\\d+)$/', $tree['value']) &&
             !is_numeric($tree['value']) &&
-            !isset($this->ptg[$tree['value']])
-        ) {
+            !isset($this->ptg[$tree['value']])) {
             // left subtree for a function is always an array.
             if ($tree['left'] != '') {
                 $left_tree = $this->toReversePolish($tree['left']);
             } else {
                 $left_tree = '';
             }
-
             // add it's left subtree and return.
             return $left_tree . $this->convertFunction($tree['value'], $tree['right']);
         }

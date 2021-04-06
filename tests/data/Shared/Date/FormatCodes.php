@@ -146,16 +146,4 @@ return [
         false,
         '#,##0.00 "dollars"',
     ],
-    [
-        true,
-        '"date " y-m-d',
-    ],
-    [
-        false,
-        '\C\H\-00000',
-    ],
-    [
-        false,
-        '\D-00000',
-    ],
 ];

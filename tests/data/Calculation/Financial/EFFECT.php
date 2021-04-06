@@ -2,8 +2,6 @@
 
 // nominal_rate, npery, Result
 
-use PhpOffice\PhpSpreadsheet\Calculation\Functions;
-
 return [
     [
         0.053542667370758003,
@@ -26,23 +24,8 @@ return [
         2,
     ],
     [
-        Functions::NAN(),
-        0.025,
-        -1,
-    ],
-    [
-        Functions::NAN(),
-        -0.025,
+        '#NUM!',
         1,
-    ],
-    [
-        Functions::VALUE(),
-        0.025,
-        'NaN',
-    ],
-    [
-        Functions::VALUE(),
-        'NaN',
-        1,
+        0,
     ],
 ];

@@ -10,22 +10,16 @@ use PHPUnit\Framework\TestCase;
 
 class FunctionsTest extends TestCase
 {
-    private $compatibilityMode;
-
-    private $returnDate;
-
     protected function setUp(): void
     {
-        $this->compatibilityMode = Functions::getCompatibilityMode();
-        $this->returnDate = Functions::getReturnDateType();
         Functions::setCompatibilityMode(Functions::COMPATIBILITY_EXCEL);
         Functions::setReturnDateType(Functions::RETURNDATE_EXCEL);
     }
 
     protected function tearDown(): void
     {
-        Functions::setCompatibilityMode($this->compatibilityMode);
-        Functions::setReturnDateType($this->returnDate);
+        Functions::setCompatibilityMode(Functions::COMPATIBILITY_EXCEL);
+        Functions::setReturnDateType(Functions::RETURNDATE_EXCEL);
     }
 
     public function testCompatibilityMode(): void

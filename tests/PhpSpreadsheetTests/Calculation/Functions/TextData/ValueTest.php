@@ -2,37 +2,34 @@
 
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\TextData;
 
+use PhpOffice\PhpSpreadsheet\Calculation\Functions;
 use PhpOffice\PhpSpreadsheet\Calculation\TextData;
 use PhpOffice\PhpSpreadsheet\Shared\StringHelper;
 use PHPUnit\Framework\TestCase;
 
 class ValueTest extends TestCase
 {
-    private $currencyCode;
-
-    private $decimalSeparator;
-
-    private $thousandsSeparator;
-
     protected function setUp(): void
     {
-        $this->currencyCode = StringHelper::getCurrencyCode();
-        $this->decimalSeparator = StringHelper::getDecimalSeparator();
-        $this->thousandsSeparator = StringHelper::getThousandsSeparator();
+        Functions::setCompatibilityMode(Functions::COMPATIBILITY_EXCEL);
+        StringHelper::setDecimalSeparator('.');
+        StringHelper::setThousandsSeparator(',');
+        StringHelper::setCurrencyCode('$');
     }
 
     protected function tearDown(): void
     {
-        StringHelper::setCurrencyCode($this->currencyCode);
-        StringHelper::setDecimalSeparator($this->decimalSeparator);
-        StringHelper::setThousandsSeparator($this->thousandsSeparator);
+        Functions::setCompatibilityMode(Functions::COMPATIBILITY_EXCEL);
+        StringHelper::setDecimalSeparator('.');
+        StringHelper::setThousandsSeparator(',');
+        StringHelper::setCurrencyCode('$');
     }
 
     /**
      * @dataProvider providerVALUE
      *
      * @param mixed $expectedResult
-     * @param mixed $value
+     * @param $value
      */
     public function testVALUE($expectedResult, $value): void
     {

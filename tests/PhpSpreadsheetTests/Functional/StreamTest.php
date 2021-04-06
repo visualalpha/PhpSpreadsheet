@@ -10,23 +10,16 @@ class StreamTest extends TestCase
 {
     public function providerFormats(): array
     {
-        $providerFormats = [
+        return [
             ['Xls'],
             ['Xlsx'],
             ['Ods'],
             ['Csv'],
             ['Html'],
+            ['Tcpdf'],
+            ['Dompdf'],
             ['Mpdf'],
         ];
-
-        if (\PHP_VERSION_ID < 80000) {
-            $providerFormats = array_merge(
-                $providerFormats,
-                [['Tcpdf'], ['Dompdf']]
-            );
-        }
-
-        return $providerFormats;
     }
 
     /**

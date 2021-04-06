@@ -1,17 +1,10 @@
 <?php
 
-use PhpOffice\PhpSpreadsheet\Calculation\Functions;
-
 return [
     [
-        Functions::NAN(),
+        '#NUM!',
         '12.34+5.67j',
         '123.45+67.89i',
-    ],
-    [
-        Functions::NAN(),
-        '12.34+5.67j',
-        'Invalid Complex Number',
     ],
     [
         '12.34+5.67j',

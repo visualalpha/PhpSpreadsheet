@@ -2,33 +2,25 @@
 
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\MathTrig;
 
-class PowerTest extends AllSetupTeardown
+use PhpOffice\PhpSpreadsheet\Calculation\Functions;
+use PhpOffice\PhpSpreadsheet\Calculation\MathTrig;
+use PHPUnit\Framework\TestCase;
+
+class PowerTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        Functions::setCompatibilityMode(Functions::COMPATIBILITY_EXCEL);
+    }
+
     /**
      * @dataProvider providerPOWER
      *
      * @param mixed $expectedResult
-     * @param mixed $base
-     * @param mixed $exponent
      */
-    public function testPOWER($expectedResult, $base = 'omitted', $exponent = 'omitted'): void
+    public function testPOWER($expectedResult, ...$args): void
     {
-        $this->mightHaveException($expectedResult);
-        $sheet = $this->sheet;
-        if ($base !== null) {
-            $sheet->getCell('A1')->setValue($base);
-        }
-        if ($exponent !== null) {
-            $sheet->getCell('A2')->setValue($exponent);
-        }
-        if ($base === 'omitted') {
-            $sheet->getCell('B1')->setValue('=POWER()');
-        } elseif ($exponent === 'omitted') {
-            $sheet->getCell('B1')->setValue('=POWER(A1)');
-        } else {
-            $sheet->getCell('B1')->setValue('=POWER(A1,A2)');
-        }
-        $result = $sheet->getCell('B1')->getCalculatedValue();
+        $result = MathTrig::POWER(...$args);
         self::assertEqualsWithDelta($expectedResult, $result, 1E-12);
     }
 

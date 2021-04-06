@@ -2,7 +2,6 @@
 
 namespace PhpOffice\PhpSpreadsheet\Reader;
 
-use PhpOffice\PhpSpreadsheet\Reader\Exception as ReaderException;
 use PhpOffice\PhpSpreadsheet\Reader\Security\XmlScanner;
 use PhpOffice\PhpSpreadsheet\Shared\File;
 
@@ -134,7 +133,11 @@ abstract class BaseReader implements IReader
 
     public function getSecurityScanner()
     {
-        return $this->securityScanner;
+        if (property_exists($this, 'securityScanner')) {
+            return $this->securityScanner;
+        }
+
+        return null;
     }
 
     /**
@@ -144,18 +147,12 @@ abstract class BaseReader implements IReader
      */
     protected function openFile($pFilename): void
     {
-        if ($pFilename) {
-            File::assertFile($pFilename);
+        File::assertFile($pFilename);
 
-            // Open file
-            $fileHandle = fopen($pFilename, 'rb');
-        } else {
-            $fileHandle = false;
-        }
-        if ($fileHandle !== false) {
-            $this->fileHandle = $fileHandle;
-        } else {
-            throw new ReaderException('Could not open file ' . $pFilename . ' for reading.');
+        // Open file
+        $this->fileHandle = fopen($pFilename, 'rb');
+        if ($this->fileHandle === false) {
+            throw new Exception('Could not open file ' . $pFilename . ' for reading.');
         }
     }
 }

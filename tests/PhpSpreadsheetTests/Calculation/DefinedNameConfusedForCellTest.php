@@ -18,6 +18,5 @@ class DefinedNameConfusedForCellTest extends TestCase
         $filename = tempnam(File::sysGetTempDir(), 'phpspreadsheet-test');
         $writer->save($filename);
         self::assertTrue(true);
-        unlink($filename);
     }
 }

@@ -47,8 +47,11 @@ class Border extends Supervisor
      * @param bool $isSupervisor Flag indicating if this is a supervisor or not
      *                                    Leave this value at default unless you understand exactly what
      *                                        its ramifications are
+     * @param bool $isConditional Flag indicating if this is a conditional style or not
+     *                                    Leave this value at default unless you understand exactly what
+     *                                        its ramifications are
      */
-    public function __construct($isSupervisor = false)
+    public function __construct($isSupervisor = false, $isConditional = false)
     {
         // Supervisor?
         parent::__construct($isSupervisor);
@@ -70,22 +73,26 @@ class Border extends Supervisor
      */
     public function getSharedComponent()
     {
-        /** @var Borders $sharedComponent */
-        $sharedComponent = $this->parent->getSharedComponent();
         switch ($this->parentPropertyName) {
-            case 'bottom':
-                return $sharedComponent->getBottom();
-            case 'diagonal':
-                return $sharedComponent->getDiagonal();
-            case 'left':
-                return $sharedComponent->getLeft();
-            case 'right':
-                return $sharedComponent->getRight();
-            case 'top':
-                return $sharedComponent->getTop();
-        }
+            case 'allBorders':
+            case 'horizontal':
+            case 'inside':
+            case 'outline':
+            case 'vertical':
+                throw new PhpSpreadsheetException('Cannot get shared component for a pseudo-border.');
 
-        throw new PhpSpreadsheetException('Cannot get shared component for a pseudo-border.');
+                break;
+            case 'bottom':
+                return $this->parent->getSharedComponent()->getBottom();
+            case 'diagonal':
+                return $this->parent->getSharedComponent()->getDiagonal();
+            case 'left':
+                return $this->parent->getSharedComponent()->getLeft();
+            case 'right':
+                return $this->parent->getSharedComponent()->getRight();
+            case 'top':
+                return $this->parent->getSharedComponent()->getTop();
+        }
     }
 
     /**
@@ -220,14 +227,5 @@ class Border extends Supervisor
             $this->color->getHashCode() .
             __CLASS__
         );
-    }
-
-    protected function exportArray1(): array
-    {
-        $exportedArray = [];
-        $this->exportArray2($exportedArray, 'borderStyle', $this->getBorderStyle());
-        $this->exportArray2($exportedArray, 'color', $this->getColor());
-
-        return $exportedArray;
     }
 }

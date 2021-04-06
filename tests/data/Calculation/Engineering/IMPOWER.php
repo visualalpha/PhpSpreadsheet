@@ -1,16 +1,9 @@
 <?php
 
-use PhpOffice\PhpSpreadsheet\Calculation\Functions;
-
 return [
     [
         '120.1267+139.9356j',
         '12.34+5.67j',
-        2,
-    ],
-    [
-        Functions::NAN(),
-        'Invalid Complex Number',
         2,
     ],
     [
@@ -64,7 +57,7 @@ return [
         '2.5',
     ],
     [
-        Functions::VALUE(),
+        '#VALUE!',
         '2.5i',
         '2.5i',
     ],

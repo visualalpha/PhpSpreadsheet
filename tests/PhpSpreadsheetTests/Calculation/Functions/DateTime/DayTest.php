@@ -2,43 +2,40 @@
 
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\DateTime;
 
-class DayTest extends AllSetupTeardown
+use PhpOffice\PhpSpreadsheet\Calculation\DateTime;
+use PhpOffice\PhpSpreadsheet\Calculation\Functions;
+use PhpOffice\PhpSpreadsheet\Shared\Date;
+use PHPUnit\Framework\TestCase;
+
+class DayTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        Functions::setCompatibilityMode(Functions::COMPATIBILITY_EXCEL);
+        Functions::setReturnDateType(Functions::RETURNDATE_EXCEL);
+        Date::setExcelCalendar(Date::CALENDAR_WINDOWS_1900);
+    }
+
     /**
      * @dataProvider providerDAY
      *
      * @param mixed $expectedResultExcel
+     * @param mixed $expectedResultOpenOffice
+     * @param $dateTimeValue
      */
-    public function testDAY($expectedResultExcel, string $dateTimeValue): void
+    public function testDAY($expectedResultExcel, $expectedResultOpenOffice, $dateTimeValue): void
     {
-        $this->mightHaveException($expectedResultExcel);
-        $sheet = $this->sheet;
-        $sheet->getCell('B1')->setValue('1954-11-23');
-        $sheet->getCell('A1')->setValue("=DAY($dateTimeValue)");
-        self::assertSame($expectedResultExcel, $sheet->getCell('A1')->getCalculatedValue());
+        $resultExcel = DateTime::DAYOFMONTH($dateTimeValue);
+        self::assertEqualsWithDelta($expectedResultExcel, $resultExcel, 1E-8);
+
+        Functions::setCompatibilityMode(Functions::COMPATIBILITY_OPENOFFICE);
+
+        $resultOpenOffice = DateTime::DAYOFMONTH($dateTimeValue);
+        self::assertEqualsWithDelta($expectedResultOpenOffice, $resultOpenOffice, 1E-8);
     }
 
     public function providerDAY()
     {
         return require 'tests/data/Calculation/DateTime/DAY.php';
-    }
-
-    /**
-     * @dataProvider providerDAYOpenOffice
-     *
-     * @param mixed $expectedResultOpenOffice
-     */
-    public function testDAYOpenOffice($expectedResultOpenOffice, string $dateTimeValue): void
-    {
-        self::setOpenOffice();
-        $this->mightHaveException($expectedResultOpenOffice);
-        $sheet = $this->sheet;
-        $sheet->getCell('A2')->setValue("=DAY($dateTimeValue)");
-        self::assertSame($expectedResultOpenOffice, $sheet->getCell('A2')->getCalculatedValue());
-    }
-
-    public function providerDAYOpenOffice()
-    {
-        return require 'tests/data/Calculation/DateTime/DAYOpenOffice.php';
     }
 }

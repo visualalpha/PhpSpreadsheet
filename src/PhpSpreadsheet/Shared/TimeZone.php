@@ -23,7 +23,7 @@ class TimeZone
      */
     private static function validateTimeZone($timezone)
     {
-        return in_array($timezone, DateTimeZone::listIdentifiers(DateTimeZone::ALL_WITH_BC));
+        return in_array($timezone, DateTimeZone::listIdentifiers());
     }
 
     /**
@@ -71,6 +71,10 @@ class TimeZone
             }
         } else {
             $timezone = self::$timezone;
+        }
+
+        if ($timezone == 'UST') {
+            return 0;
         }
 
         $objTimezone = new DateTimeZone($timezone);

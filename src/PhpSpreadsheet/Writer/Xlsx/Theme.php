@@ -784,9 +784,13 @@ class Theme extends WriterPart
     /**
      * Write fonts to XML format.
      *
-     * @param string[] $fontSet
+     * @param XMLWriter $objWriter
+     * @param string $latinFont
+     * @param array of string                $fontSet
+     *
+     * @return string XML Output
      */
-    private function writeFonts(XMLWriter $objWriter, string $latinFont, array $fontSet): void
+    private function writeFonts($objWriter, $latinFont, $fontSet)
     {
         // a:latin
         $objWriter->startElement('a:latin');
@@ -813,8 +817,12 @@ class Theme extends WriterPart
 
     /**
      * Write colour scheme to XML format.
+     *
+     * @param XMLWriter $objWriter
+     *
+     * @return string XML Output
      */
-    private function writeColourScheme(XMLWriter $objWriter): void
+    private function writeColourScheme($objWriter)
     {
         foreach (self::$colourScheme as $colourName => $colourValue) {
             $objWriter->startElement('a:' . $colourName);

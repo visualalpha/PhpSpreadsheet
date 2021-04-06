@@ -2,34 +2,26 @@
 
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\MathTrig;
 
-class QuotientTest extends AllSetupTeardown
+use PhpOffice\PhpSpreadsheet\Calculation\Functions;
+use PhpOffice\PhpSpreadsheet\Calculation\MathTrig;
+use PHPUnit\Framework\TestCase;
+
+class QuotientTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        Functions::setCompatibilityMode(Functions::COMPATIBILITY_EXCEL);
+    }
+
     /**
      * @dataProvider providerQUOTIENT
      *
      * @param mixed $expectedResult
-     * @param mixed $arg1
-     * @param mixed $arg2
      */
-    public function testQUOTIENT($expectedResult, $arg1 = 'omitted', $arg2 = 'omitted'): void
+    public function testQUOTIENT($expectedResult, ...$args): void
     {
-        $this->mightHaveException($expectedResult);
-        $sheet = $this->sheet;
-        if ($arg1 !== null) {
-            $sheet->getCell('A1')->setValue($arg1);
-        }
-        if ($arg2 !== null) {
-            $sheet->getCell('A2')->setValue($arg2);
-        }
-        if ($arg1 === 'omitted') {
-            $sheet->getCell('B1')->setValue('=QUOTIENT()');
-        } elseif ($arg2 === 'omitted') {
-            $sheet->getCell('B1')->setValue('=QUOTIENT(A1)');
-        } else {
-            $sheet->getCell('B1')->setValue('=QUOTIENT(A1, A2)');
-        }
-        $result = $sheet->getCell('B1')->getCalculatedValue();
-        self::assertSame($expectedResult, $result);
+        $result = MathTrig::QUOTIENT(...$args);
+        self::assertEqualsWithDelta($expectedResult, $result, 1E-12);
     }
 
     public function providerQUOTIENT()

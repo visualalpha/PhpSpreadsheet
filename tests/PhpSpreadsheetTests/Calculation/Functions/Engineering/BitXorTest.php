@@ -2,27 +2,26 @@
 
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\Engineering;
 
-use PhpOffice\PhpSpreadsheet\Calculation\Exception as CalcExp;
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Calculation\Engineering;
+use PhpOffice\PhpSpreadsheet\Calculation\Functions;
 use PHPUnit\Framework\TestCase;
 
 class BitXorTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        Functions::setCompatibilityMode(Functions::COMPATIBILITY_EXCEL);
+    }
+
     /**
      * @dataProvider providerBITXOR
      *
      * @param mixed $expectedResult
+     * @param mixed[] $args
      */
-    public function testBITXOR($expectedResult, string $formula): void
+    public function testBITXOR($expectedResult, array $args): void
     {
-        if ($expectedResult === 'exception') {
-            $this->expectException(CalcExp::class);
-        }
-        $spreadsheet = new Spreadsheet();
-        $sheet = $spreadsheet->getActiveSheet();
-        $sheet->setCellValue('A2', 8);
-        $sheet->getCell('A1')->setValue("=BITXOR($formula)");
-        $result = $sheet->getCell('A1')->getCalculatedValue();
+        $result = Engineering::BITXOR(...$args);
         self::assertEquals($expectedResult, $result);
     }
 

@@ -178,8 +178,9 @@ class PolynomialBestFit extends BestFit
      * @param int $order Order of Polynomial for this regression
      * @param float[] $yValues The set of Y-values for this regression
      * @param float[] $xValues The set of X-values for this regression
+     * @param bool $const
      */
-    public function __construct($order, $yValues, $xValues = [])
+    public function __construct($order, $yValues, $xValues = [], $const = true)
     {
         parent::__construct($yValues, $xValues);
 

@@ -2,27 +2,25 @@
 
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\MathTrig;
 
-class MdeTermTest extends AllSetupTeardown
+use PhpOffice\PhpSpreadsheet\Calculation\Functions;
+use PhpOffice\PhpSpreadsheet\Calculation\MathTrig;
+use PHPUnit\Framework\TestCase;
+
+class MdeTermTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        Functions::setCompatibilityMode(Functions::COMPATIBILITY_EXCEL);
+    }
+
     /**
      * @dataProvider providerMDETERM
      *
      * @param mixed $expectedResult
-     * @param mixed $matrix expect a matrix
      */
-    public function testMDETERM2($expectedResult, $matrix): void
+    public function testMDETERM($expectedResult, ...$args): void
     {
-        $this->mightHaveException($expectedResult);
-        $sheet = $this->sheet;
-        if (is_array($matrix)) {
-            $sheet->fromArray($matrix, null, 'A1', true);
-            $maxCol = $sheet->getHighestColumn();
-            $maxRow = $sheet->getHighestRow();
-            $sheet->getCell('Z1')->setValue("=MDETERM(A1:$maxCol$maxRow)");
-        } else {
-            $sheet->getCell('Z1')->setValue("=MDETERM($matrix)");
-        }
-        $result = $sheet->getCell('Z1')->getCalculatedValue();
+        $result = MathTrig::MDETERM(...$args);
         self::assertEqualsWithDelta($expectedResult, $result, 1E-12);
     }
 

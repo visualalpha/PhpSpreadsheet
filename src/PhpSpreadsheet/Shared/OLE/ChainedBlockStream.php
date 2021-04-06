@@ -42,7 +42,7 @@ class ChainedBlockStream
      *                                    ole-chainedblockstream://oleInstanceId=1
      * @param string $mode only "r" is supported
      * @param int $options mask of STREAM_REPORT_ERRORS and STREAM_USE_PATH
-     * @param string $openedPath absolute path of the opened stream (out parameter)
+     * @param string &$openedPath absolute path of the opened stream (out parameter)
      *
      * @return bool true on success
      */
@@ -71,7 +71,7 @@ class ChainedBlockStream
         $this->data = '';
         if (isset($this->params['size']) && $this->params['size'] < $this->ole->bigBlockThreshold && $blockId != $this->ole->root->startBlock) {
             // Block id refers to small blocks
-            $rootPos = $this->ole->getBlockOffset($this->ole->root->startBlock);
+            $rootPos = $this->ole->_getBlockOffset($this->ole->root->startBlock);
             while ($blockId != -2) {
                 $pos = $rootPos + $blockId * $this->ole->bigBlockSize;
                 $blockId = $this->ole->sbat[$blockId];
@@ -81,7 +81,7 @@ class ChainedBlockStream
         } else {
             // Block id refers to big blocks
             while ($blockId != -2) {
-                $pos = $this->ole->getBlockOffset($blockId);
+                $pos = $this->ole->_getBlockOffset($blockId);
                 fseek($this->ole->_file_handle, $pos);
                 $this->data .= fread($this->ole->_file_handle, $this->ole->bigBlockSize);
                 $blockId = $this->ole->bbat[$blockId];

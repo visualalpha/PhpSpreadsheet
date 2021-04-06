@@ -1,15 +1,9 @@
 <?php
 
-use PhpOffice\PhpSpreadsheet\Calculation\Functions;
-
 return [
     [
         '1.13290930735019+0.187055234944717j',
         '12.34+5.67j',
-    ],
-    [
-        Functions::NAN(),
-        'Invalid Complex Number',
     ],
     [
         '9.83122969386706+0.682188176920927i',
@@ -64,7 +58,7 @@ return [
         'i',
     ],
     [
-        Functions::NAN(),
+        '#NUM!',
         '0',
     ],
     [

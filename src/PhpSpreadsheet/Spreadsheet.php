@@ -3,7 +3,6 @@
 namespace PhpOffice\PhpSpreadsheet;
 
 use PhpOffice\PhpSpreadsheet\Calculation\Calculation;
-use PhpOffice\PhpSpreadsheet\Shared\StringHelper;
 use PhpOffice\PhpSpreadsheet\Style\Style;
 use PhpOffice\PhpSpreadsheet\Worksheet\Iterator;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
@@ -14,9 +13,6 @@ class Spreadsheet
     const VISIBILITY_VISIBLE = 'visible';
     const VISIBILITY_HIDDEN = 'hidden';
     const VISIBILITY_VERY_HIDDEN = 'veryHidden';
-
-    private const DEFINED_NAME_IS_RANGE = false;
-    private const DEFINED_NAME_IS_FORMULA = true;
 
     private static $workbookViewVisibilityValues = [
         self::VISIBILITY_VISIBLE,
@@ -55,7 +51,7 @@ class Spreadsheet
     /**
      * Calculation Engine.
      *
-     * @var null|Calculation
+     * @var Calculation
      */
     private $calculationEngine;
 
@@ -71,7 +67,7 @@ class Spreadsheet
      *
      * @var NamedRange[]
      */
-    private $definedNames = [];
+    private $namedRanges = [];
 
     /**
      * CellXf supervisor.
@@ -373,9 +369,7 @@ class Spreadsheet
      */
     private function getExtensionOnly($path)
     {
-        $extension = pathinfo($path, PATHINFO_EXTENSION);
-
-        return is_array($extension) ? '' : $extension;
+        return pathinfo($path, PATHINFO_EXTENSION);
     }
 
     /**
@@ -402,10 +396,8 @@ class Spreadsheet
 
                 break;
             case 'types':
-                if (
-                    is_array($this->ribbonBinObjects) &&
-                    isset($this->ribbonBinObjects['data']) && is_array($this->ribbonBinObjects['data'])
-                ) {
+                if (is_array($this->ribbonBinObjects) &&
+                    isset($this->ribbonBinObjects['data']) && is_array($this->ribbonBinObjects['data'])) {
                     $tmpTypes = array_keys($this->ribbonBinObjects['data']);
                     $ReturnData = array_unique(array_map([$this, 'getExtensionOnly'], $tmpTypes));
                 } else {
@@ -488,8 +480,8 @@ class Spreadsheet
         // Create document security
         $this->security = new Document\Security();
 
-        // Set defined names
-        $this->definedNames = [];
+        // Set named ranges
+        $this->namedRanges = [];
 
         // Create the cellXf supervisor
         $this->cellXfSupervisor = new Style(true);
@@ -505,8 +497,8 @@ class Spreadsheet
      */
     public function __destruct()
     {
-        $this->disconnectWorksheets();
         $this->calculationEngine = null;
+        $this->disconnectWorksheets();
     }
 
     /**
@@ -527,7 +519,7 @@ class Spreadsheet
     /**
      * Return the calculation engine for this worksheet.
      *
-     * @return null|Calculation
+     * @return Calculation
      */
     public function getCalculationEngine()
     {
@@ -665,10 +657,8 @@ class Spreadsheet
         array_splice($this->workSheetCollection, $pIndex, 1);
 
         // Adjust active sheet index if necessary
-        if (
-            ($this->activeSheetIndex >= $pIndex) &&
-            ($this->activeSheetIndex > 0 || $numSheets <= 1)
-        ) {
+        if (($this->activeSheetIndex >= $pIndex) &&
+            ($pIndex > count($this->workSheetCollection) - 1)) {
             --$this->activeSheetIndex;
         }
     }
@@ -730,7 +720,7 @@ class Spreadsheet
     public function getIndex(Worksheet $pSheet)
     {
         foreach ($this->workSheetCollection as $key => $value) {
-            if ($value->getHashCode() === $pSheet->getHashCode()) {
+            if ($value->getHashCode() == $pSheet->getHashCode()) {
                 return $key;
             }
         }
@@ -874,159 +864,54 @@ class Spreadsheet
     }
 
     /**
-     * Get an array of all Named Ranges.
+     * Get named ranges.
      *
      * @return NamedRange[]
      */
-    public function getNamedRanges(): array
+    public function getNamedRanges()
     {
-        return array_filter(
-            $this->definedNames,
-            function (DefinedName $definedName) {
-                return $definedName->isFormula() === self::DEFINED_NAME_IS_RANGE;
-            }
-        );
+        return $this->namedRanges;
     }
 
     /**
-     * Get an array of all Named Formulae.
+     * Add named range.
      *
-     * @return NamedFormula[]
+     * @return bool
      */
-    public function getNamedFormulae(): array
+    public function addNamedRange(NamedRange $namedRange)
     {
-        return array_filter(
-            $this->definedNames,
-            function (DefinedName $definedName) {
-                return $definedName->isFormula() === self::DEFINED_NAME_IS_FORMULA;
-            }
-        );
-    }
-
-    /**
-     * Get an array of all Defined Names (both named ranges and named formulae).
-     *
-     * @return DefinedName[]
-     */
-    public function getDefinedNames(): array
-    {
-        return $this->definedNames;
-    }
-
-    /**
-     * Add a named range.
-     * If a named range with this name already exists, then this will replace the existing value.
-     */
-    public function addNamedRange(NamedRange $namedRange): void
-    {
-        $this->addDefinedName($namedRange);
-    }
-
-    /**
-     * Add a named formula.
-     * If a named formula with this name already exists, then this will replace the existing value.
-     */
-    public function addNamedFormula(NamedFormula $namedFormula): void
-    {
-        $this->addDefinedName($namedFormula);
-    }
-
-    /**
-     * Add a defined name (either a named range or a named formula).
-     * If a defined named with this name already exists, then this will replace the existing value.
-     */
-    public function addDefinedName(DefinedName $definedName): void
-    {
-        $upperCaseName = StringHelper::strToUpper($definedName->getName());
-        if ($definedName->getScope() == null) {
+        if ($namedRange->getScope() == null) {
             // global scope
-            $this->definedNames[$upperCaseName] = $definedName;
+            $this->namedRanges[$namedRange->getName()] = $namedRange;
         } else {
             // local scope
-            $this->definedNames[$definedName->getScope()->getTitle() . '!' . $upperCaseName] = $definedName;
+            $this->namedRanges[$namedRange->getScope()->getTitle() . '!' . $namedRange->getName()] = $namedRange;
         }
+
+        return true;
     }
 
     /**
      * Get named range.
      *
+     * @param string $namedRange
      * @param null|Worksheet $pSheet Scope. Use null for global scope
-     */
-    public function getNamedRange(string $namedRange, ?Worksheet $pSheet = null): ?NamedRange
-    {
-        $returnValue = null;
-
-        if ($namedRange !== '') {
-            $namedRange = StringHelper::strToUpper($namedRange);
-            // first look for global named range
-            $returnValue = $this->getGlobalDefinedNameByType($namedRange, self::DEFINED_NAME_IS_RANGE);
-            // then look for local named range (has priority over global named range if both names exist)
-            $returnValue = $this->getLocalDefinedNameByType($namedRange, self::DEFINED_NAME_IS_RANGE, $pSheet) ?: $returnValue;
-        }
-
-        return $returnValue instanceof NamedRange ? $returnValue : null;
-    }
-
-    /**
-     * Get named formula.
      *
-     * @param null|Worksheet $pSheet Scope. Use null for global scope
+     * @return null|NamedRange
      */
-    public function getNamedFormula(string $namedFormula, ?Worksheet $pSheet = null): ?NamedFormula
+    public function getNamedRange($namedRange, ?Worksheet $pSheet = null)
     {
         $returnValue = null;
 
-        if ($namedFormula !== '') {
-            $namedFormula = StringHelper::strToUpper($namedFormula);
-            // first look for global named formula
-            $returnValue = $this->getGlobalDefinedNameByType($namedFormula, self::DEFINED_NAME_IS_FORMULA);
-            // then look for local named formula (has priority over global named formula if both names exist)
-            $returnValue = $this->getLocalDefinedNameByType($namedFormula, self::DEFINED_NAME_IS_FORMULA, $pSheet) ?: $returnValue;
-        }
-
-        return $returnValue instanceof NamedFormula ? $returnValue : null;
-    }
-
-    private function getGlobalDefinedNameByType(string $name, bool $type): ?DefinedName
-    {
-        if (isset($this->definedNames[$name]) && $this->definedNames[$name]->isFormula() === $type) {
-            return $this->definedNames[$name];
-        }
-
-        return null;
-    }
-
-    private function getLocalDefinedNameByType(string $name, bool $type, ?Worksheet $pSheet = null): ?DefinedName
-    {
-        if (
-            ($pSheet !== null) && isset($this->definedNames[$pSheet->getTitle() . '!' . $name])
-            && $this->definedNames[$pSheet->getTitle() . '!' . $name]->isFormula() === $type
-        ) {
-            return $this->definedNames[$pSheet->getTitle() . '!' . $name];
-        }
-
-        return null;
-    }
-
-    /**
-     * Get named range.
-     *
-     * @param null|Worksheet $pSheet Scope. Use null for global scope
-     */
-    public function getDefinedName(string $definedName, ?Worksheet $pSheet = null): ?DefinedName
-    {
-        $returnValue = null;
-
-        if ($definedName !== '') {
-            $definedName = StringHelper::strToUpper($definedName);
+        if ($namedRange != '' && ($namedRange !== null)) {
             // first look for global defined name
-            if (isset($this->definedNames[$definedName])) {
-                $returnValue = $this->definedNames[$definedName];
+            if (isset($this->namedRanges[$namedRange])) {
+                $returnValue = $this->namedRanges[$namedRange];
             }
 
             // then look for local defined name (has priority over global defined name if both names exist)
-            if (($pSheet !== null) && isset($this->definedNames[$pSheet->getTitle() . '!' . $definedName])) {
-                $returnValue = $this->definedNames[$pSheet->getTitle() . '!' . $definedName];
+            if (($pSheet !== null) && isset($this->namedRanges[$pSheet->getTitle() . '!' . $namedRange])) {
+                $returnValue = $this->namedRanges[$pSheet->getTitle() . '!' . $namedRange];
             }
         }
 
@@ -1036,55 +921,20 @@ class Spreadsheet
     /**
      * Remove named range.
      *
+     * @param string $namedRange
      * @param null|Worksheet $pSheet scope: use null for global scope
      *
      * @return $this
      */
-    public function removeNamedRange(string $namedRange, ?Worksheet $pSheet = null): self
+    public function removeNamedRange($namedRange, ?Worksheet $pSheet = null)
     {
-        if ($this->getNamedRange($namedRange, $pSheet) === null) {
-            return $this;
-        }
-
-        return $this->removeDefinedName($namedRange, $pSheet);
-    }
-
-    /**
-     * Remove named formula.
-     *
-     * @param null|Worksheet $pSheet scope: use null for global scope
-     *
-     * @return $this
-     */
-    public function removeNamedFormula(string $namedFormula, ?Worksheet $pSheet = null): self
-    {
-        if ($this->getNamedFormula($namedFormula, $pSheet) === null) {
-            return $this;
-        }
-
-        return $this->removeDefinedName($namedFormula, $pSheet);
-    }
-
-    /**
-     * Remove defined name.
-     *
-     * @param null|Worksheet $pSheet scope: use null for global scope
-     *
-     * @return $this
-     */
-    public function removeDefinedName(string $definedName, ?Worksheet $pSheet = null): self
-    {
-        $definedName = StringHelper::strToUpper($definedName);
-
         if ($pSheet === null) {
-            if (isset($this->definedNames[$definedName])) {
-                unset($this->definedNames[$definedName]);
+            if (isset($this->namedRanges[$namedRange])) {
+                unset($this->namedRanges[$namedRange]);
             }
         } else {
-            if (isset($this->definedNames[$pSheet->getTitle() . '!' . $definedName])) {
-                unset($this->definedNames[$pSheet->getTitle() . '!' . $definedName]);
-            } elseif (isset($this->definedNames[$definedName])) {
-                unset($this->definedNames[$definedName]);
+            if (isset($this->namedRanges[$pSheet->getTitle() . '!' . $namedRange])) {
+                unset($this->namedRanges[$pSheet->getTitle() . '!' . $namedRange]);
             }
         }
 
@@ -1163,7 +1013,7 @@ class Spreadsheet
     public function getCellXfByHashCode($pValue)
     {
         foreach ($this->cellXfCollection as $cellXf) {
-            if ($cellXf->getHashCode() === $pValue) {
+            if ($cellXf->getHashCode() == $pValue) {
                 return $cellXf;
             }
         }
@@ -1278,7 +1128,7 @@ class Spreadsheet
     public function getCellStyleXfByHashCode($pValue)
     {
         foreach ($this->cellStyleXfCollection as $cellStyleXf) {
-            if ($cellStyleXf->getHashCode() === $pValue) {
+            if ($cellStyleXf->getHashCode() == $pValue) {
                 return $cellStyleXf;
             }
         }
@@ -1343,7 +1193,6 @@ class Spreadsheet
         // remove cellXfs without references and create mapping so we can update xfIndex
         // for all cells and columns
         $countNeededCellXfs = 0;
-        $map = [];
         foreach ($this->cellXfCollection as $index => $cellXf) {
             if ($countReferencesCellXf[$index] > 0 || $index == 0) { // we must never remove the first cellXf
                 ++$countNeededCellXfs;

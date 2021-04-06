@@ -3,27 +3,10 @@
 namespace PhpOffice\PhpSpreadsheetTests\Shared;
 
 use PhpOffice\PhpSpreadsheet\Shared\Date;
-use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 use PHPUnit\Framework\TestCase;
 
 class DateTest extends TestCase
 {
-    private $excelCalendar;
-
-    private $dttimezone;
-
-    protected function setUp(): void
-    {
-        $this->dttimezone = Date::getDefaultTimeZone();
-        $this->excelCalendar = Date::getExcelCalendar();
-    }
-
-    protected function tearDown(): void
-    {
-        Date::setDefaultTimeZone($this->dttimezone);
-        Date::setExcelCalendar($this->excelCalendar);
-    }
-
     public function testSetExcelCalendar(): void
     {
         $calendarValues = [
@@ -39,7 +22,7 @@ class DateTest extends TestCase
 
     public function testSetExcelCalendarWithInvalidValue(): void
     {
-        $unsupportedCalendar = 2012;
+        $unsupportedCalendar = '2012';
         $result = Date::setExcelCalendar($unsupportedCalendar);
         self::assertFalse($result);
     }
@@ -48,16 +31,12 @@ class DateTest extends TestCase
      * @dataProvider providerDateTimeExcelToTimestamp1900
      *
      * @param mixed $expectedResult
-     * @param mixed $excelDateTimeValue
      */
-    public function testDateTimeExcelToTimestamp1900($expectedResult, $excelDateTimeValue): void
+    public function testDateTimeExcelToTimestamp1900($expectedResult, ...$args): void
     {
-        if (is_numeric($expectedResult) && ($expectedResult > PHP_INT_MAX || $expectedResult < PHP_INT_MIN)) {
-            self::markTestSkipped('Test invalid on 32-bit system.');
-        }
         Date::setExcelCalendar(Date::CALENDAR_WINDOWS_1900);
 
-        $result = Date::excelToTimestamp($excelDateTimeValue);
+        $result = Date::excelToTimestamp(...$args);
         self::assertEquals($expectedResult, $result);
     }
 
@@ -70,13 +49,12 @@ class DateTest extends TestCase
      * @dataProvider providerDateTimeTimestampToExcel1900
      *
      * @param mixed $expectedResult
-     * @param mixed $unixTimestamp
      */
-    public function testDateTimeTimestampToExcel1900($expectedResult, $unixTimestamp): void
+    public function testDateTimeTimestampToExcel1900($expectedResult, ...$args): void
     {
         Date::setExcelCalendar(Date::CALENDAR_WINDOWS_1900);
 
-        $result = Date::timestampToExcel($unixTimestamp);
+        $result = Date::timestampToExcel(...$args);
         self::assertEqualsWithDelta($expectedResult, $result, 1E-5);
     }
 
@@ -89,13 +67,12 @@ class DateTest extends TestCase
      * @dataProvider providerDateTimeDateTimeToExcel
      *
      * @param mixed $expectedResult
-     * @param mixed $dateTimeObject
      */
-    public function testDateTimeDateTimeToExcel($expectedResult, $dateTimeObject): void
+    public function testDateTimeDateTimeToExcel($expectedResult, ...$args): void
     {
         Date::setExcelCalendar(Date::CALENDAR_WINDOWS_1900);
 
-        $result = Date::dateTimeToExcel($dateTimeObject);
+        $result = Date::dateTimeToExcel(...$args);
         self::assertEqualsWithDelta($expectedResult, $result, 1E-5);
     }
 
@@ -126,16 +103,12 @@ class DateTest extends TestCase
      * @dataProvider providerDateTimeExcelToTimestamp1904
      *
      * @param mixed $expectedResult
-     * @param mixed $excelDateTimeValue
      */
-    public function testDateTimeExcelToTimestamp1904($expectedResult, $excelDateTimeValue): void
+    public function testDateTimeExcelToTimestamp1904($expectedResult, ...$args): void
     {
-        if (is_numeric($expectedResult) && ($expectedResult > PHP_INT_MAX || $expectedResult < PHP_INT_MIN)) {
-            self::markTestSkipped('Test invalid on 32-bit system.');
-        }
         Date::setExcelCalendar(Date::CALENDAR_MAC_1904);
 
-        $result = Date::excelToTimestamp($excelDateTimeValue);
+        $result = Date::excelToTimestamp(...$args);
         self::assertEquals($expectedResult, $result);
     }
 
@@ -148,13 +121,12 @@ class DateTest extends TestCase
      * @dataProvider providerDateTimeTimestampToExcel1904
      *
      * @param mixed $expectedResult
-     * @param mixed $unixTimestamp
      */
-    public function testDateTimeTimestampToExcel1904($expectedResult, $unixTimestamp): void
+    public function testDateTimeTimestampToExcel1904($expectedResult, ...$args): void
     {
         Date::setExcelCalendar(Date::CALENDAR_MAC_1904);
 
-        $result = Date::timestampToExcel($unixTimestamp);
+        $result = Date::timestampToExcel(...$args);
         self::assertEqualsWithDelta($expectedResult, $result, 1E-5);
     }
 
@@ -183,67 +155,17 @@ class DateTest extends TestCase
      * @dataProvider providerDateTimeExcelToTimestamp1900Timezone
      *
      * @param mixed $expectedResult
-     * @param mixed $excelDateTimeValue
-     * @param mixed $timezone
      */
-    public function testDateTimeExcelToTimestamp1900Timezone($expectedResult, $excelDateTimeValue, $timezone): void
+    public function testDateTimeExcelToTimestamp1900Timezone($expectedResult, ...$args): void
     {
-        if (is_numeric($expectedResult) && ($expectedResult > PHP_INT_MAX || $expectedResult < PHP_INT_MIN)) {
-            self::markTestSkipped('Test invalid on 32-bit system.');
-        }
         Date::setExcelCalendar(Date::CALENDAR_WINDOWS_1900);
 
-        $result = Date::excelToTimestamp($excelDateTimeValue, $timezone);
+        $result = Date::excelToTimestamp(...$args);
         self::assertEquals($expectedResult, $result);
     }
 
     public function providerDateTimeExcelToTimestamp1900Timezone()
     {
         return require 'tests/data/Shared/Date/ExcelToTimestamp1900Timezone.php';
-    }
-
-    public function testVarious(): void
-    {
-        Date::setDefaultTimeZone('UTC');
-        self::assertFalse(Date::stringToExcel('2019-02-29'));
-        self::assertTrue((bool) Date::stringToExcel('2019-02-28'));
-        self::assertTrue((bool) Date::stringToExcel('2019-02-28 11:18'));
-        self::assertFalse(Date::stringToExcel('2019-02-28 11:71'));
-
-        $date = Date::PHPToExcel('2020-01-01');
-        self::assertEquals(43831.0, $date);
-
-        $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
-        $sheet = $spreadsheet->getActiveSheet();
-        $sheet->setCellValue('B1', 'x');
-        $val = $sheet->getCell('B1')->getValue();
-        self::assertFalse(Date::timestampToExcel($val));
-
-        $cell = $sheet->getCell('A1');
-        self::assertNotNull($cell);
-
-        $cell->setValue($date);
-        $sheet->getStyle('A1')
-            ->getNumberFormat()
-            ->setFormatCode(NumberFormat::FORMAT_DATE_DATETIME);
-        self::assertTrue(null !== $cell && Date::isDateTime($cell));
-
-        $cella2 = $sheet->getCell('A2');
-        self::assertNotNull($cella2);
-
-        $cella2->setValue('=A1+2');
-        $sheet->getStyle('A2')
-            ->getNumberFormat()
-            ->setFormatCode(NumberFormat::FORMAT_DATE_DATETIME);
-        self::assertTrue(null !== $cella2 && Date::isDateTime($cella2));
-
-        $cella3 = $sheet->getCell('A3');
-        self::assertNotNull($cella3);
-
-        $cella3->setValue('=A1+4');
-        $sheet->getStyle('A3')
-            ->getNumberFormat()
-            ->setFormatCode('0.00E+00');
-        self::assertFalse(null !== $cella3 && Date::isDateTime($cella3));
     }
 }

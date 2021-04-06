@@ -5,5 +5,3 @@ edit_uri: edit/master/docs/
 theme: readthedocs
 extra_css:
     - extra/extra.css
-extra_javascript:
-    - extra/extrajs.js

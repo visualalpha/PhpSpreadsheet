@@ -2,8 +2,17 @@
 
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\MathTrig;
 
-class AcothTest extends AllSetupTeardown
+use PhpOffice\PhpSpreadsheet\Calculation\Functions;
+use PhpOffice\PhpSpreadsheet\Calculation\MathTrig;
+use PHPUnit\Framework\TestCase;
+
+class AcothTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        Functions::setCompatibilityMode(Functions::COMPATIBILITY_EXCEL);
+    }
+
     /**
      * @dataProvider providerACOTH
      *
@@ -12,15 +21,8 @@ class AcothTest extends AllSetupTeardown
      */
     public function testACOTH($expectedResult, $number): void
     {
-        $this->mightHaveException($expectedResult);
-        $sheet = $this->sheet;
-        $sheet->setCellValue('A2', 1.3);
-        $sheet->setCellValue('A3', 2.7);
-        $sheet->setCellValue('A4', -3.8);
-        $sheet->setCellValue('A5', -10);
-        $sheet->getCell('A1')->setValue("=ACOTH($number)");
-        $result = $sheet->getCell('A1')->getCalculatedValue();
-        self::assertEqualsWithDelta($expectedResult, $result, 1E-9);
+        $result = MathTrig::ACOTH($number);
+        self::assertEqualsWithDelta($expectedResult, $result, 1E-12);
     }
 
     public function providerACOTH()

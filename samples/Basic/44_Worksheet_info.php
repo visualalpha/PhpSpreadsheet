@@ -24,5 +24,3 @@ var_dump($sheetList);
 
 $helper->log('Worksheet Names:');
 var_dump($sheetInfo);
-
-unlink($filename);

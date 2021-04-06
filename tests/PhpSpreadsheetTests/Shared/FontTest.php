@@ -3,7 +3,6 @@
 namespace PhpOffice\PhpSpreadsheetTests\Shared;
 
 use PhpOffice\PhpSpreadsheet\Shared\Font;
-use PhpOffice\PhpSpreadsheet\Style\Font as StyleFont;
 use PHPUnit\Framework\TestCase;
 
 class FontTest extends TestCase
@@ -41,11 +40,10 @@ class FontTest extends TestCase
      * @dataProvider providerFontSizeToPixels
      *
      * @param mixed $expectedResult
-     * @param mixed $size
      */
-    public function testFontSizeToPixels($expectedResult, $size): void
+    public function testFontSizeToPixels($expectedResult, ...$args): void
     {
-        $result = Font::fontSizeToPixels($size);
+        $result = Font::fontSizeToPixels(...$args);
         self::assertEquals($expectedResult, $result);
     }
 
@@ -58,11 +56,10 @@ class FontTest extends TestCase
      * @dataProvider providerInchSizeToPixels
      *
      * @param mixed $expectedResult
-     * @param mixed $size
      */
-    public function testInchSizeToPixels($expectedResult, $size): void
+    public function testInchSizeToPixels($expectedResult, ...$args): void
     {
-        $result = Font::inchSizeToPixels($size);
+        $result = Font::inchSizeToPixels(...$args);
         self::assertEquals($expectedResult, $result);
     }
 
@@ -75,28 +72,15 @@ class FontTest extends TestCase
      * @dataProvider providerCentimeterSizeToPixels
      *
      * @param mixed $expectedResult
-     * @param mixed $size
      */
-    public function testCentimeterSizeToPixels($expectedResult, $size): void
+    public function testCentimeterSizeToPixels($expectedResult, ...$args): void
     {
-        $result = Font::centimeterSizeToPixels($size);
+        $result = Font::centimeterSizeToPixels(...$args);
         self::assertEquals($expectedResult, $result);
     }
 
     public function providerCentimeterSizeToPixels()
     {
         return require 'tests/data/Shared/CentimeterSizeToPixels.php';
-    }
-
-    public function testVerdanaRotation(): void
-    {
-        $font = new StyleFont();
-        $font->setName('Verdana')->setSize(10);
-        $width = Font::getTextWidthPixelsApprox('n', $font, 0);
-        self::assertEquals(8, $width);
-        $width = Font::getTextWidthPixelsApprox('n', $font, 45);
-        self::assertEquals(7, $width);
-        $width = Font::getTextWidthPixelsApprox('n', $font, -165);
-        self::assertEquals(4, $width);
     }
 }

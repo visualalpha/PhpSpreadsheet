@@ -1,7 +1,5 @@
 <?php
 
-use PhpOffice\PhpSpreadsheet\Calculation\Functions;
-
 return [
     [
         '3+4i',
@@ -16,16 +14,8 @@ return [
         12.34, 5.6699999999999999, 'j',
     ],
     [
-        Functions::VALUE(),
-        3.5, 'NaN',
-    ],
-    [
-        Functions::VALUE(),
-        'NaN', 3.5,
-    ],
-    [
-        Functions::VALUE(),
-        1.5, 3.5, 'invalid suffix',
+        '#VALUE!',
+        3.5, 'A',
     ],
     [
         '1.234E-5+6780000000i',

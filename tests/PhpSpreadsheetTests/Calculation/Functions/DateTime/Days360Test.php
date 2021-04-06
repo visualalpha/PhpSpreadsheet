@@ -2,21 +2,32 @@
 
 namespace PhpOffice\PhpSpreadsheetTests\Calculation\Functions\DateTime;
 
-class Days360Test extends AllSetupTeardown
+use PhpOffice\PhpSpreadsheet\Calculation\DateTime;
+use PhpOffice\PhpSpreadsheet\Calculation\Functions;
+use PhpOffice\PhpSpreadsheet\Shared\Date;
+use PHPUnit\Framework\TestCase;
+
+class Days360Test extends TestCase
 {
+    protected function setUp(): void
+    {
+        Functions::setCompatibilityMode(Functions::COMPATIBILITY_EXCEL);
+        Functions::setReturnDateType(Functions::RETURNDATE_EXCEL);
+        Date::setExcelCalendar(Date::CALENDAR_WINDOWS_1900);
+    }
+
     /**
      * @dataProvider providerDAYS360
      *
      * @param mixed $expectedResult
+     * @param $startDate
+     * @param $endDate
+     * @param $method
      */
-    public function testDAYS360($expectedResult, string $formula): void
+    public function testDAYS360($expectedResult, $startDate, $endDate, $method): void
     {
-        $this->mightHaveException($expectedResult);
-        $sheet = $this->sheet;
-        $sheet->getCell('B1')->setValue('2000-02-29');
-        $sheet->getCell('C1')->setValue('2000-03-31');
-        $sheet->getCell('A1')->setValue("=DAYS360($formula)");
-        self::assertSame($expectedResult, $sheet->getCell('A1')->getCalculatedValue());
+        $result = DateTime::DAYS360($startDate, $endDate, $method);
+        self::assertEqualsWithDelta($expectedResult, $result, 1E-8);
     }
 
     public function providerDAYS360()

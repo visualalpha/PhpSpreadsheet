@@ -6,10 +6,6 @@ return [
         'HELLO      ',
     ],
     [
-        ' HELLO ',
-        ' HELLO ',
-    ],
-    [
         'HELLO',
         '	HELLO',
     ],
