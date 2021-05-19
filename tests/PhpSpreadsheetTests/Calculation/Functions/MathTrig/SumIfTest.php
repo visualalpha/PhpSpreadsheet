@@ -16,7 +16,7 @@ class SumIfTest extends AllSetupTeardown
         if ($expectedResult === 'incomplete') {
             self::markTestIncomplete('Raises formula error - researching solution');
         }
-        $sheet = $this->sheet;
+        $sheet = $this->getSheet();
         $sheet->fromArray($array1, null, 'A1', true);
         $maxARow = count($array1);
         $firstArg = "A1:A$maxARow";
@@ -35,7 +35,7 @@ class SumIfTest extends AllSetupTeardown
         self::assertEqualsWithDelta($expectedResult, $result, 1E-12);
     }
 
-    public function providerSUMIF()
+    public function providerSUMIF(): array
     {
         return require 'tests/data/Calculation/MathTrig/SUMIF.php';
     }

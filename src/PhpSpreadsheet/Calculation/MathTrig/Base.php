@@ -2,7 +2,7 @@
 
 namespace PhpOffice\PhpSpreadsheet\Calculation\MathTrig;
 
-use Exception;
+use PhpOffice\PhpSpreadsheet\Calculation\Exception;
 use PhpOffice\PhpSpreadsheet\Calculation\Functions;
 
 class Base
@@ -21,7 +21,7 @@ class Base
      *
      * @return string the text representation with the given radix (base)
      */
-    public static function funcBase($number, $radix, $minLength = null)
+    public static function evaluate($number, $radix, $minLength = null)
     {
         try {
             $number = (int) Helpers::validateNumericNullBool($number);
@@ -36,7 +36,7 @@ class Base
                 return Functions::NAN(); // Numeric range constraints
             }
 
-            $outcome = strtoupper((string) base_convert($number, 10, $radix));
+            $outcome = strtoupper((string) base_convert((string) $number, 10, $radix));
             if ($minLength !== null) {
                 $outcome = str_pad($outcome, (int) $minLength, '0', STR_PAD_LEFT); // String padding
             }

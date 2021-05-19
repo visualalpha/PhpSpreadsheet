@@ -13,7 +13,7 @@ class SecTest extends AllSetupTeardown
     public function testSEC($expectedResult, $angle): void
     {
         $this->mightHaveException($expectedResult);
-        $sheet = $this->sheet;
+        $sheet = $this->getSheet();
         $sheet->setCellValue('A2', 1.3);
         $sheet->setCellValue('A3', 2.7);
         $sheet->setCellValue('A4', -3.8);
@@ -23,7 +23,7 @@ class SecTest extends AllSetupTeardown
         self::assertEqualsWithDelta($expectedResult, $result, 1E-9);
     }
 
-    public function providerSEC()
+    public function providerSEC(): array
     {
         return require 'tests/data/Calculation/MathTrig/SEC.php';
     }

@@ -14,7 +14,7 @@ class AutoFilter
     /**
      * Autofilter Worksheet.
      *
-     * @var Worksheet
+     * @var null|Worksheet
      */
     private $workSheet;
 
@@ -47,7 +47,7 @@ class AutoFilter
     /**
      * Get AutoFilter Parent Worksheet.
      *
-     * @return Worksheet
+     * @return null|Worksheet
      */
     public function getParent()
     {
@@ -472,7 +472,7 @@ class AutoFilter
         $val = $maxVal = null;
 
         $ruleValues = [];
-        $baseDate = DateTimeExcel\Now::funcNow();
+        $baseDate = DateTimeExcel\Current::now();
         //    Calculate start/end dates for the required date range based on current date
         switch ($dynamicRuleType) {
             case AutoFilter\Column\Rule::AUTOFILTER_RULETYPE_DYNAMIC_LASTWEEK:
@@ -791,10 +791,10 @@ class AutoFilter
                     if ($ruleOperator === AutoFilter\Column\Rule::AUTOFILTER_COLUMN_RULE_TOPTEN_PERCENT) {
                         $ruleValue = floor($ruleValue * ($dataRowCount / 100));
                     }
-                    if ($ruleValue < 1) {
+                    if (!is_array($ruleValue) && $ruleValue < 1) {
                         $ruleValue = 1;
                     }
-                    if ($ruleValue > 500) {
+                    if (!is_array($ruleValue) && $ruleValue > 500) {
                         $ruleValue = 500;
                     }
 

@@ -12,7 +12,7 @@ class GcdTest extends AllSetupTeardown
     public function testGCD($expectedResult, ...$args): void
     {
         $this->mightHaveException($expectedResult);
-        $sheet = $this->sheet;
+        $sheet = $this->getSheet();
         $row = 0;
         foreach ($args as $arg) {
             ++$row;
@@ -29,7 +29,7 @@ class GcdTest extends AllSetupTeardown
         self::assertEqualsWithDelta($expectedResult, $result, 1E-12);
     }
 
-    public function providerGCD()
+    public function providerGCD(): array
     {
         return require 'tests/data/Calculation/MathTrig/GCD.php';
     }

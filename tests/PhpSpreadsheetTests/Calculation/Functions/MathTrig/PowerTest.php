@@ -14,7 +14,7 @@ class PowerTest extends AllSetupTeardown
     public function testPOWER($expectedResult, $base = 'omitted', $exponent = 'omitted'): void
     {
         $this->mightHaveException($expectedResult);
-        $sheet = $this->sheet;
+        $sheet = $this->getSheet();
         if ($base !== null) {
             $sheet->getCell('A1')->setValue($base);
         }
@@ -32,7 +32,7 @@ class PowerTest extends AllSetupTeardown
         self::assertEqualsWithDelta($expectedResult, $result, 1E-12);
     }
 
-    public function providerPOWER()
+    public function providerPOWER(): array
     {
         return require 'tests/data/Calculation/MathTrig/POWER.php';
     }

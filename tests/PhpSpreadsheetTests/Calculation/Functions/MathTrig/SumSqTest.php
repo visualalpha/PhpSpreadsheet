@@ -14,7 +14,7 @@ class SumSqTest extends AllSetupTeardown
         $this->mightHaveException($expectedResult);
         $maxRow = 0;
         $funcArg = '';
-        $sheet = $this->sheet;
+        $sheet = $this->getSheet();
         foreach ($args as $arg) {
             ++$maxRow;
             $funcArg = "A1:A$maxRow";
@@ -27,7 +27,7 @@ class SumSqTest extends AllSetupTeardown
         self::assertEqualsWithDelta($expectedResult, $result, 1E-12);
     }
 
-    public function providerSUMSQ()
+    public function providerSUMSQ(): array
     {
         return require 'tests/data/Calculation/MathTrig/SUMSQ.php';
     }

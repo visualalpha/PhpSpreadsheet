@@ -12,7 +12,7 @@ class Atan2Test extends AllSetupTeardown
     public function testATAN2($expectedResult, string $formula): void
     {
         $this->mightHaveException($expectedResult);
-        $sheet = $this->sheet;
+        $sheet = $this->getSheet();
         $sheet->getCell('A2')->setValue(5);
         $sheet->getCell('A3')->setValue(6);
         $sheet->getCell('A1')->setValue("=ATAN2($formula)");
@@ -20,7 +20,7 @@ class Atan2Test extends AllSetupTeardown
         self::assertEqualsWithDelta($expectedResult, $result, 1E-9);
     }
 
-    public function providerATAN2()
+    public function providerATAN2(): array
     {
         return require 'tests/data/Calculation/MathTrig/ATAN2.php';
     }

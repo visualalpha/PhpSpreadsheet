@@ -13,7 +13,7 @@ class FactTest extends AllSetupTeardown
     public function testFACT($expectedResult, $arg1): void
     {
         $this->mightHaveException($expectedResult);
-        $sheet = $this->sheet;
+        $sheet = $this->getSheet();
         if ($arg1 !== null) {
             $sheet->getCell('A1')->setValue($arg1);
         }
@@ -26,7 +26,7 @@ class FactTest extends AllSetupTeardown
         self::assertEquals($expectedResult, $result);
     }
 
-    public function providerFACT()
+    public function providerFACT(): array
     {
         return require 'tests/data/Calculation/MathTrig/FACT.php';
     }
@@ -41,7 +41,7 @@ class FactTest extends AllSetupTeardown
     {
         $this->mightHaveException($expectedResult);
         self::setGnumeric();
-        $sheet = $this->sheet;
+        $sheet = $this->getSheet();
         if ($arg1 !== null) {
             $sheet->getCell('A1')->setValue($arg1);
         }
@@ -54,7 +54,7 @@ class FactTest extends AllSetupTeardown
         self::assertEquals($expectedResult, $result);
     }
 
-    public function providerFACTGnumeric()
+    public function providerFACTGnumeric(): array
     {
         return require 'tests/data/Calculation/MathTrig/FACTGNUMERIC.php';
     }

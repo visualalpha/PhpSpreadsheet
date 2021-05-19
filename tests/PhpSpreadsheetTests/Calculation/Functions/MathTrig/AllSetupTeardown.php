@@ -6,29 +6,39 @@ use PhpOffice\PhpSpreadsheet\Calculation\Exception as CalcException;
 use PhpOffice\PhpSpreadsheet\Calculation\Functions;
 use PhpOffice\PhpSpreadsheet\Cell\DataType;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use PHPUnit\Framework\TestCase;
 
 class AllSetupTeardown extends TestCase
 {
-    protected $compatibilityMode;
+    /**
+     * @var string
+     */
+    private $compatibilityMode;
 
-    protected $spreadsheet;
+    /**
+     * @var ?Spreadsheet
+     */
+    private $spreadsheet;
 
-    protected $sheet;
+    /**
+     * @var ?Worksheet
+     */
+    private $sheet;
 
     protected function setUp(): void
     {
         $this->compatibilityMode = Functions::getCompatibilityMode();
-        $this->spreadsheet = new Spreadsheet();
-        $this->sheet = $this->spreadsheet->getActiveSheet();
     }
 
     protected function tearDown(): void
     {
         Functions::setCompatibilityMode($this->compatibilityMode);
-        $this->spreadsheet->disconnectWorksheets();
-        $this->spreadsheet = null;
         $this->sheet = null;
+        if ($this->spreadsheet !== null) {
+            $this->spreadsheet->disconnectWorksheets();
+            $this->spreadsheet = null;
+        }
     }
 
     protected static function setOpenOffice(): void
@@ -58,10 +68,30 @@ class AllSetupTeardown extends TestCase
     {
         if ($value !== null) {
             if (is_string($value) && is_numeric($value)) {
-                $this->sheet->getCell($cell)->setValueExplicit($value, DataType::TYPE_STRING);
+                $this->getSheet()->getCell($cell)->setValueExplicit($value, DataType::TYPE_STRING);
             } else {
-                $this->sheet->getCell($cell)->setValue($value);
+                $this->getSheet()->getCell($cell)->setValue($value);
             }
         }
+    }
+
+    protected function getSpreadsheet(): Spreadsheet
+    {
+        if ($this->spreadsheet !== null) {
+            return $this->spreadsheet;
+        }
+        $this->spreadsheet = new Spreadsheet();
+
+        return $this->spreadsheet;
+    }
+
+    protected function getSheet(): Worksheet
+    {
+        if ($this->sheet !== null) {
+            return $this->sheet;
+        }
+        $this->sheet = $this->getSpreadsheet()->getActiveSheet();
+
+        return $this->sheet;
     }
 }

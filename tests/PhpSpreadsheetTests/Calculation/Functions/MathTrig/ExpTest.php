@@ -13,7 +13,7 @@ class ExpTest extends AllSetupTeardown
     public function testEXP($expectedResult, $number = 'omitted'): void
     {
         $this->mightHaveException($expectedResult);
-        $sheet = $this->sheet;
+        $sheet = $this->getSheet();
         if ($number !== null) {
             $sheet->getCell('A1')->setValue($number);
         }
@@ -26,7 +26,7 @@ class ExpTest extends AllSetupTeardown
         self::assertEqualsWithDelta($expectedResult, $result, 1E-12);
     }
 
-    public function providerEXP()
+    public function providerEXP(): array
     {
         return require 'tests/data/Calculation/MathTrig/EXP.php';
     }

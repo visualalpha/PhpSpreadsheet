@@ -255,7 +255,7 @@ class Date
      *
      * @param int $dateValue Unix Timestamp
      *
-     * @return float MS Excel serialized date/time value
+     * @return false|float MS Excel serialized date/time value
      */
     public static function timestampToExcel($dateValue)
     {
@@ -437,14 +437,14 @@ class Date
             return false;
         }
 
-        $dateValueNew = DateTimeExcel\DateValue::funcDateValue($dateValue);
+        $dateValueNew = DateTimeExcel\DateValue::fromString($dateValue);
 
         if ($dateValueNew === Functions::VALUE()) {
             return false;
         }
 
         if (strpos($dateValue, ':') !== false) {
-            $timeValue = DateTimeExcel\TimeValue::funcTimeValue($dateValue);
+            $timeValue = DateTimeExcel\TimeValue::fromString($dateValue);
             if ($timeValue === Functions::VALUE()) {
                 return false;
             }

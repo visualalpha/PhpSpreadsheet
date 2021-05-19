@@ -13,7 +13,7 @@ class FloorMathTest extends AllSetupTeardown
     public function testFLOORMATH($expectedResult, $formula): void
     {
         $this->mightHaveException($expectedResult);
-        $sheet = $this->sheet;
+        $sheet = $this->getSheet();
         $sheet->setCellValue('A2', 1.3);
         $sheet->setCellValue('A3', 2.7);
         $sheet->setCellValue('A4', -3.8);
@@ -23,7 +23,7 @@ class FloorMathTest extends AllSetupTeardown
         self::assertEqualsWithDelta($expectedResult, $result, 1E-12);
     }
 
-    public function providerFLOORMATH()
+    public function providerFLOORMATH(): array
     {
         return require 'tests/data/Calculation/MathTrig/FLOORMATH.php';
     }

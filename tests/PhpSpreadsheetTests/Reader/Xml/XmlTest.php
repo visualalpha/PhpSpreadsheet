@@ -19,7 +19,7 @@ class XmlTest extends TestCase
         $xmlReader->trySimpleXMLLoadString($filename);
     }
 
-    public function providerInvalidSimpleXML()
+    public function providerInvalidSimpleXML(): array
     {
         $tests = [];
         foreach (glob('tests/data/Reader/Xml/XEETestInvalidSimpleXML*.xml') as $file) {
@@ -44,5 +44,29 @@ class XmlTest extends TestCase
         self::assertEquals(DataType::TYPE_STRING, $hyperlink->getDataType());
         self::assertEquals('PhpSpreadsheet', $hyperlink->getValue());
         self::assertEquals('https://phpspreadsheet.readthedocs.io', $hyperlink->getHyperlink()->getUrl());
+    }
+
+    public function testLoadCorruptedFile(): void
+    {
+        $this->expectException(\PhpOffice\PhpSpreadsheet\Reader\Exception::class);
+
+        $xmlReader = new Xml();
+        $xmlReader->load('tests/data/Reader/Xml/CorruptedXmlFile.xml');
+    }
+
+    public function testListWorksheetNamesCorruptedFile(): void
+    {
+        $this->expectException(\PhpOffice\PhpSpreadsheet\Reader\Exception::class);
+
+        $xmlReader = new Xml();
+        $xmlReader->listWorksheetNames('tests/data/Reader/Xml/CorruptedXmlFile.xml');
+    }
+
+    public function testListWorksheetInfoCorruptedFile(): void
+    {
+        $this->expectException(\PhpOffice\PhpSpreadsheet\Reader\Exception::class);
+
+        $xmlReader = new Xml();
+        $xmlReader->listWorksheetInfo('tests/data/Reader/Xml/CorruptedXmlFile.xml');
     }
 }
