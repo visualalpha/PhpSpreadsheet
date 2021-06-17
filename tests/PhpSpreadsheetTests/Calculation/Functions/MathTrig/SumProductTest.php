@@ -13,7 +13,7 @@ class SumProductTest extends AllSetupTeardown
      */
     public function testSUMPRODUCT($expectedResult, ...$args): void
     {
-        $sheet = $this->sheet;
+        $sheet = $this->getSheet();
         $row = 0;
         $arrayArg = '';
         foreach ($args as $arr) {
@@ -34,7 +34,7 @@ class SumProductTest extends AllSetupTeardown
         self::assertEqualsWithDelta($expectedResult, $result, 1E-12);
     }
 
-    public function providerSUMPRODUCT()
+    public function providerSUMPRODUCT(): array
     {
         return require 'tests/data/Calculation/MathTrig/SUMPRODUCT.php';
     }

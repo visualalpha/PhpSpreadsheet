@@ -15,7 +15,7 @@ class BaseTest extends AllSetupTeardown
     public function testBASE($expectedResult, $arg1 = 'omitted', $arg2 = 'omitted', $arg3 = 'omitted'): void
     {
         $this->mightHaveException($expectedResult);
-        $sheet = $this->sheet;
+        $sheet = $this->getSheet();
         if ($arg1 !== null) {
             $sheet->getCell('A1')->setValue($arg1);
         }
@@ -38,7 +38,7 @@ class BaseTest extends AllSetupTeardown
         self::assertEquals($expectedResult, $result);
     }
 
-    public function providerBASE()
+    public function providerBASE(): array
     {
         return require 'tests/data/Calculation/MathTrig/BASE.php';
     }

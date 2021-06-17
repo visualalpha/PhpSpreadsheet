@@ -14,7 +14,7 @@ class CombinATest extends AllSetupTeardown
     public function testCOMBINA($expectedResult, $numObjs, $numInSet): void
     {
         $this->mightHaveException($expectedResult);
-        $sheet = $this->sheet;
+        $sheet = $this->getSheet();
         if ($numObjs !== null) {
             $sheet->getCell('A1')->setValue($numObjs);
         }
@@ -26,7 +26,7 @@ class CombinATest extends AllSetupTeardown
         self::assertEquals($expectedResult, $result);
     }
 
-    public function providerCOMBINA()
+    public function providerCOMBINA(): array
     {
         return require 'tests/data/Calculation/MathTrig/COMBINA.php';
     }

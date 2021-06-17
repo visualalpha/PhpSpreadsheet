@@ -81,14 +81,14 @@ class Xls extends BaseWriter
     /**
      * Basic OLE object summary information.
      *
-     * @var array
+     * @var string
      */
     private $summaryInformation;
 
     /**
      * Extended OLE object document summary information.
      *
-     * @var array
+     * @var string
      */
     private $documentSummaryInformation;
 
@@ -119,8 +119,10 @@ class Xls extends BaseWriter
      *
      * @param resource|string $pFilename
      */
-    public function save($pFilename): void
+    public function save($pFilename, int $flags = 0): void
     {
+        $this->processFlags($flags);
+
         // garbage collect
         $this->spreadsheet->garbageCollect();
 
@@ -219,7 +221,8 @@ class Xls extends BaseWriter
             $arrRootData[] = $OLE_DocumentSummaryInformation;
         }
 
-        $root = new Root(time(), time(), $arrRootData);
+        $time = $this->spreadsheet->getProperties()->getModified();
+        $root = new Root($time, $time, $arrRootData);
         // save the OLE file
         $this->openFileHandle($pFilename);
         $root->save($this->fileHandle);
@@ -727,6 +730,7 @@ class Xls extends BaseWriter
             } elseif ($dataProp['type']['data'] == 0x1E) { // null-terminated string prepended by dword string length
                 // Null-terminated string
                 $dataProp['data']['data'] .= chr(0);
+                // @phpstan-ignore-next-line
                 ++$dataProp['data']['length'];
                 // Complete the string with null string for being a %4
                 $dataProp['data']['length'] = $dataProp['data']['length'] + ((4 - $dataProp['data']['length'] % 4) == 4 ? 0 : (4 - $dataProp['data']['length'] % 4));
@@ -744,6 +748,7 @@ class Xls extends BaseWriter
             } else {
                 $dataSection_Content .= $dataProp['data']['data'];
 
+                // @phpstan-ignore-next-line
                 $dataSection_Content_Offset += 4 + $dataProp['data']['length'];
             }
         }
@@ -763,7 +768,10 @@ class Xls extends BaseWriter
         return $data;
     }
 
-    private function writeSummaryPropOle(int $dataProp, int &$dataSection_NumProps, array &$dataSection, int $sumdata, int $typdata): void
+    /**
+     * @param float|int $dataProp
+     */
+    private function writeSummaryPropOle($dataProp, int &$dataSection_NumProps, array &$dataSection, int $sumdata, int $typdata): void
     {
         if ($dataProp) {
             $dataSection[] = [

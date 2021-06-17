@@ -12,7 +12,7 @@ class DegreesTest extends AllSetupTeardown
      */
     public function testDegrees($expectedResult, $number = 'omitted'): void
     {
-        $sheet = $this->sheet;
+        $sheet = $this->getSheet();
         $this->mightHaveException($expectedResult);
         $this->setCell('A1', $number);
         if ($number === 'omitted') {
@@ -24,7 +24,7 @@ class DegreesTest extends AllSetupTeardown
         self::assertEqualsWithDelta($expectedResult, $result, 1E-8);
     }
 
-    public function providerDegrees()
+    public function providerDegrees(): array
     {
         return require 'tests/data/Calculation/MathTrig/DEGREES.php';
     }

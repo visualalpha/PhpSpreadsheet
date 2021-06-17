@@ -126,7 +126,7 @@ class HashTable
      *
      * @param int $pIndex
      *
-     * @return T
+     * @return null|T
      */
     public function getByIndex($pIndex)
     {
@@ -142,7 +142,7 @@ class HashTable
      *
      * @param string $pHashCode
      *
-     * @return T
+     * @return null|T
      */
     public function getByHashCode($pHashCode)
     {
@@ -170,8 +170,15 @@ class HashTable
     {
         $vars = get_object_vars($this);
         foreach ($vars as $key => $value) {
-            if (is_object($value)) {
-                $this->$key = clone $value;
+            // each member of this class is an array
+            if (is_array($value)) {
+                $array1 = $value;
+                foreach ($array1 as $key1 => $value1) {
+                    if (is_object($value1)) {
+                        $array1[$key1] = clone $value1;
+                    }
+                }
+                $this->$key = $array1;
             }
         }
     }

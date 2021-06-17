@@ -14,7 +14,7 @@ class ModTest extends AllSetupTeardown
     public function testMOD($expectedResult, $dividend = 'omitted', $divisor = 'omitted'): void
     {
         $this->mightHaveException($expectedResult);
-        $sheet = $this->sheet;
+        $sheet = $this->getSheet();
         if ($dividend !== null) {
             $sheet->getCell('A1')->setValue($dividend);
         }
@@ -32,7 +32,7 @@ class ModTest extends AllSetupTeardown
         self::assertEqualsWithDelta($expectedResult, $result, 1E-12);
     }
 
-    public function providerMOD()
+    public function providerMOD(): array
     {
         return require 'tests/data/Calculation/MathTrig/MOD.php';
     }

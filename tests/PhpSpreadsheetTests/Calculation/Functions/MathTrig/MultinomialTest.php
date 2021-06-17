@@ -12,7 +12,7 @@ class MultinomialTest extends AllSetupTeardown
     public function testMULTINOMIAL($expectedResult, ...$args): void
     {
         $this->mightHaveException($expectedResult);
-        $sheet = $this->sheet;
+        $sheet = $this->getSheet();
         $row = 0;
         $excelArg = '';
         foreach ($args as $arg) {
@@ -27,7 +27,7 @@ class MultinomialTest extends AllSetupTeardown
         self::assertEqualsWithDelta($expectedResult, $result, 1E-12);
     }
 
-    public function providerMULTINOMIAL()
+    public function providerMULTINOMIAL(): array
     {
         return require 'tests/data/Calculation/MathTrig/MULTINOMIAL.php';
     }

@@ -4,12 +4,10 @@ namespace PhpOffice\PhpSpreadsheet\Calculation\Statistical\Distributions;
 
 use PhpOffice\PhpSpreadsheet\Calculation\Exception;
 use PhpOffice\PhpSpreadsheet\Calculation\Functions;
-use PhpOffice\PhpSpreadsheet\Calculation\MathTrig;
+use PhpOffice\PhpSpreadsheet\Calculation\MathTrig\Combinations;
 
 class HyperGeometric
 {
-    use BaseValidations;
-
     /**
      * HYPGEOMDIST.
      *
@@ -31,10 +29,10 @@ class HyperGeometric
         $populationNumber = Functions::flattenSingleValue($populationNumber);
 
         try {
-            $sampleSuccesses = self::validateInt($sampleSuccesses);
-            $sampleNumber = self::validateInt($sampleNumber);
-            $populationSuccesses = self::validateInt($populationSuccesses);
-            $populationNumber = self::validateInt($populationNumber);
+            $sampleSuccesses = DistributionValidations::validateInt($sampleSuccesses);
+            $sampleNumber = DistributionValidations::validateInt($sampleNumber);
+            $populationSuccesses = DistributionValidations::validateInt($populationSuccesses);
+            $populationNumber = DistributionValidations::validateInt($populationNumber);
         } catch (Exception $e) {
             return $e->getMessage();
         }
@@ -49,8 +47,13 @@ class HyperGeometric
             return Functions::NAN();
         }
 
-        return MathTrig::COMBIN($populationSuccesses, $sampleSuccesses) *
-            MathTrig::COMBIN($populationNumber - $populationSuccesses, $sampleNumber - $sampleSuccesses) /
-            MathTrig::COMBIN($populationNumber, $sampleNumber);
+        $successesPopulationAndSample = (float) Combinations::withoutRepetition($populationSuccesses, $sampleSuccesses);
+        $numbersPopulationAndSample = (float) Combinations::withoutRepetition($populationNumber, $sampleNumber);
+        $adjustedPopulationAndSample = (float) Combinations::withoutRepetition(
+            $populationNumber - $populationSuccesses,
+            $sampleNumber - $sampleSuccesses
+        );
+
+        return $successesPopulationAndSample * $adjustedPopulationAndSample / $numbersPopulationAndSample;
     }
 }

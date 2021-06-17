@@ -11,7 +11,7 @@ class LcmTest extends AllSetupTeardown
      */
     public function testLCM($expectedResult, ...$args): void
     {
-        $sheet = $this->sheet;
+        $sheet = $this->getSheet();
         $row = 0;
         foreach ($args as $arg) {
             ++$row;
@@ -22,7 +22,7 @@ class LcmTest extends AllSetupTeardown
         self::assertEqualsWithDelta($expectedResult, $result, 1E-12);
     }
 
-    public function providerLCM()
+    public function providerLCM(): array
     {
         return require 'tests/data/Calculation/MathTrig/LCM.php';
     }

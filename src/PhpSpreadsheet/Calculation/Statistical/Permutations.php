@@ -5,11 +5,10 @@ namespace PhpOffice\PhpSpreadsheet\Calculation\Statistical;
 use PhpOffice\PhpSpreadsheet\Calculation\Exception;
 use PhpOffice\PhpSpreadsheet\Calculation\Functions;
 use PhpOffice\PhpSpreadsheet\Calculation\MathTrig;
+use PhpOffice\PhpSpreadsheet\Shared\IntOrFloat;
 
 class Permutations
 {
-    use BaseValidations;
-
     /**
      * PERMUT.
      *
@@ -22,7 +21,7 @@ class Permutations
      * @param mixed $numObjs Integer number of different objects
      * @param mixed $numInSet Integer number of objects in each permutation
      *
-     * @return int|string Number of permutations, or a string containing an error
+     * @return float|int|string Number of permutations, or a string containing an error
      */
     public static function PERMUT($numObjs, $numInSet)
     {
@@ -30,8 +29,8 @@ class Permutations
         $numInSet = Functions::flattenSingleValue($numInSet);
 
         try {
-            $numObjs = self::validateInt($numObjs);
-            $numInSet = self::validateInt($numInSet);
+            $numObjs = StatisticalValidations::validateInt($numObjs);
+            $numInSet = StatisticalValidations::validateInt($numInSet);
         } catch (Exception $e) {
             return $e->getMessage();
         }
@@ -39,8 +38,9 @@ class Permutations
         if ($numObjs < $numInSet) {
             return Functions::NAN();
         }
+        $result = round(MathTrig\Factorial::fact($numObjs) / MathTrig\Factorial::fact($numObjs - $numInSet));
 
-        return (int) round(MathTrig\Fact::funcFact($numObjs) / MathTrig\Fact::funcFact($numObjs - $numInSet));
+        return IntOrFloat::evaluate($result);
     }
 
     /**
@@ -52,7 +52,7 @@ class Permutations
      * @param mixed $numObjs Integer number of different objects
      * @param mixed $numInSet Integer number of objects in each permutation
      *
-     * @return int|string Number of permutations, or a string containing an error
+     * @return float|int|string Number of permutations, or a string containing an error
      */
     public static function PERMUTATIONA($numObjs, $numInSet)
     {
@@ -60,8 +60,8 @@ class Permutations
         $numInSet = Functions::flattenSingleValue($numInSet);
 
         try {
-            $numObjs = self::validateInt($numObjs);
-            $numInSet = self::validateInt($numInSet);
+            $numObjs = StatisticalValidations::validateInt($numObjs);
+            $numInSet = StatisticalValidations::validateInt($numInSet);
         } catch (Exception $e) {
             return $e->getMessage();
         }
@@ -70,6 +70,8 @@ class Permutations
             return Functions::NAN();
         }
 
-        return (int) ($numObjs ** $numInSet);
+        $result = $numObjs ** $numInSet;
+
+        return IntOrFloat::evaluate($result);
     }
 }

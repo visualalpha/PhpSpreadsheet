@@ -13,7 +13,7 @@ class LnTest extends AllSetupTeardown
     public function testLN($expectedResult, $number = 'omitted'): void
     {
         $this->mightHaveException($expectedResult);
-        $sheet = $this->sheet;
+        $sheet = $this->getSheet();
         if ($number !== null) {
             $sheet->getCell('A1')->setValue($number);
         }
@@ -26,7 +26,7 @@ class LnTest extends AllSetupTeardown
         self::assertEqualsWithDelta($expectedResult, $result, 1E-6);
     }
 
-    public function providerLN()
+    public function providerLN(): array
     {
         return require 'tests/data/Calculation/MathTrig/LN.php';
     }

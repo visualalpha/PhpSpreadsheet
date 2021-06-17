@@ -14,7 +14,7 @@ class SumX2MY2Test extends AllSetupTeardown
     public function testSUMX2MY2($expectedResult, array $matrixData1, array $matrixData2): void
     {
         $this->mightHaveException($expectedResult);
-        $sheet = $this->sheet;
+        $sheet = $this->getSheet();
         $maxRow = 0;
         $funcArg1 = '';
         foreach (Functions::flattenArray($matrixData1) as $arg) {
@@ -34,7 +34,7 @@ class SumX2MY2Test extends AllSetupTeardown
         self::assertEqualsWithDelta($expectedResult, $result, 1E-12);
     }
 
-    public function providerSUMX2MY2()
+    public function providerSUMX2MY2(): array
     {
         return require 'tests/data/Calculation/MathTrig/SUMX2MY2.php';
     }
