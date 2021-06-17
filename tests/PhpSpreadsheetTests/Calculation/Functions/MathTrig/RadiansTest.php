@@ -12,7 +12,7 @@ class RadiansTest extends AllSetupTeardown
      */
     public function testRADIANS($expectedResult, $number = 'omitted'): void
     {
-        $sheet = $this->sheet;
+        $sheet = $this->getSheet();
         $this->mightHaveException($expectedResult);
         $this->setCell('A1', $number);
         if ($number === 'omitted') {
@@ -24,7 +24,7 @@ class RadiansTest extends AllSetupTeardown
         self::assertEqualsWithDelta($expectedResult, $result, 1E-9);
     }
 
-    public function providerRADIANS()
+    public function providerRADIANS(): array
     {
         return require 'tests/data/Calculation/MathTrig/RADIANS.php';
     }

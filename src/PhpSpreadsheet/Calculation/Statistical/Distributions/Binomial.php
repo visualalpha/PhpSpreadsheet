@@ -4,12 +4,10 @@ namespace PhpOffice\PhpSpreadsheet\Calculation\Statistical\Distributions;
 
 use PhpOffice\PhpSpreadsheet\Calculation\Exception;
 use PhpOffice\PhpSpreadsheet\Calculation\Functions;
-use PhpOffice\PhpSpreadsheet\Calculation\MathTrig;
+use PhpOffice\PhpSpreadsheet\Calculation\MathTrig\Combinations;
 
 class Binomial
 {
-    use BaseValidations;
-
     /**
      * BINOMDIST.
      *
@@ -33,10 +31,10 @@ class Binomial
         $probability = Functions::flattenSingleValue($probability);
 
         try {
-            $value = self::validateInt($value);
-            $trials = self::validateInt($trials);
-            $probability = self::validateProbability($probability);
-            $cumulative = self::validateBool($cumulative);
+            $value = DistributionValidations::validateInt($value);
+            $trials = DistributionValidations::validateInt($trials);
+            $probability = DistributionValidations::validateProbability($probability);
+            $cumulative = DistributionValidations::validateBool($cumulative);
         } catch (Exception $e) {
             return $e->getMessage();
         }
@@ -49,7 +47,8 @@ class Binomial
             return self::calculateCumulativeBinomial($value, $trials, $probability);
         }
 
-        return MathTrig::COMBIN($trials, $value) * $probability ** $value * (1 - $probability) ** ($trials - $value);
+        return Combinations::withoutRepetition($trials, $value) * $probability ** $value
+            * (1 - $probability) ** ($trials - $value);
     }
 
     /**
@@ -74,10 +73,10 @@ class Binomial
         $limit = ($limit === null) ? $successes : Functions::flattenSingleValue($limit);
 
         try {
-            $trials = self::validateInt($trials);
-            $probability = self::validateProbability($probability);
-            $successes = self::validateInt($successes);
-            $limit = self::validateInt($limit);
+            $trials = DistributionValidations::validateInt($trials);
+            $probability = DistributionValidations::validateProbability($probability);
+            $successes = DistributionValidations::validateInt($successes);
+            $limit = DistributionValidations::validateInt($limit);
         } catch (Exception $e) {
             return $e->getMessage();
         }
@@ -91,7 +90,8 @@ class Binomial
 
         $summer = 0;
         for ($i = $successes; $i <= $limit; ++$i) {
-            $summer += MathTrig::COMBIN($trials, $i) * $probability ** $i * (1 - $probability) ** ($trials - $i);
+            $summer += Combinations::withoutRepetition($trials, $i) * $probability ** $i
+                * (1 - $probability) ** ($trials - $i);
         }
 
         return $summer;
@@ -122,9 +122,9 @@ class Binomial
         $probability = Functions::flattenSingleValue($probability);
 
         try {
-            $failures = self::validateInt($failures);
-            $successes = self::validateInt($successes);
-            $probability = self::validateProbability($probability);
+            $failures = DistributionValidations::validateInt($failures);
+            $successes = DistributionValidations::validateInt($successes);
+            $probability = DistributionValidations::validateProbability($probability);
         } catch (Exception $e) {
             return $e->getMessage();
         }
@@ -138,8 +138,8 @@ class Binomial
             }
         }
 
-        return (MathTrig::COMBIN($failures + $successes - 1, $successes - 1)) *
-            ($probability ** $successes) * ((1 - $probability) ** $failures);
+        return (Combinations::withoutRepetition($failures + $successes - 1, $successes - 1))
+            * ($probability ** $successes) * ((1 - $probability) ** $failures);
     }
 
     /**
@@ -161,9 +161,9 @@ class Binomial
         $alpha = Functions::flattenSingleValue($alpha);
 
         try {
-            $trials = self::validateInt($trials);
-            $probability = self::validateProbability($probability);
-            $alpha = self::validateFloat($alpha);
+            $trials = DistributionValidations::validateInt($trials);
+            $probability = DistributionValidations::validateProbability($probability);
+            $alpha = DistributionValidations::validateFloat($alpha);
         } catch (Exception $e) {
             return $e->getMessage();
         }
@@ -193,7 +193,8 @@ class Binomial
     {
         $summer = 0;
         for ($i = 0; $i <= $value; ++$i) {
-            $summer += MathTrig::COMBIN($trials, $i) * $probability ** $i * (1 - $probability) ** ($trials - $i);
+            $summer += Combinations::withoutRepetition($trials, $i) * $probability ** $i
+                * (1 - $probability) ** ($trials - $i);
         }
 
         return $summer;

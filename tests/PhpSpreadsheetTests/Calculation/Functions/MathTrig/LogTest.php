@@ -14,7 +14,7 @@ class LogTest extends AllSetupTeardown
     public function testLOG($expectedResult, $number = 'omitted', $base = 'omitted'): void
     {
         $this->mightHaveException($expectedResult);
-        $sheet = $this->sheet;
+        $sheet = $this->getSheet();
         if ($number !== null) {
             $sheet->getCell('A1')->setValue($number);
         }
@@ -32,7 +32,7 @@ class LogTest extends AllSetupTeardown
         self::assertEqualsWithDelta($expectedResult, $result, 1E-12);
     }
 
-    public function providerLOG()
+    public function providerLOG(): array
     {
         return require 'tests/data/Calculation/MathTrig/LOG.php';
     }

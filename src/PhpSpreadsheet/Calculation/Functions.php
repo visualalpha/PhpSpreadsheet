@@ -251,7 +251,7 @@ class Functions
         $condition = self::flattenSingleValue($condition);
 
         if ($condition === '') {
-            $condition = '=""';
+            return '=""';
         }
         if (!is_string($condition) || !in_array($condition[0], ['>', '<', '='])) {
             $condition = self::operandSpecialHandling($condition);
@@ -303,7 +303,7 @@ class Functions
      *
      * @param mixed $value Value to check
      *
-     * @return bool
+     * @return int|string
      */
     public static function errorType($value = '')
     {

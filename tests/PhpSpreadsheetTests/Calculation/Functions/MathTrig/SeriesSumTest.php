@@ -16,7 +16,7 @@ class SeriesSumTest extends AllSetupTeardown
      */
     public function testSERIESSUM($expectedResult, $arg1, $arg2, $arg3, ...$args): void
     {
-        $sheet = $this->sheet;
+        $sheet = $this->getSheet();
         if ($arg1 !== null) {
             $sheet->getCell('C1')->setValue($arg1);
         }
@@ -39,7 +39,7 @@ class SeriesSumTest extends AllSetupTeardown
         self::assertEqualsWithDelta($expectedResult, $result, 1E-12);
     }
 
-    public function providerSERIESSUM()
+    public function providerSERIESSUM(): array
     {
         return require 'tests/data/Calculation/MathTrig/SERIESSUM.php';
     }

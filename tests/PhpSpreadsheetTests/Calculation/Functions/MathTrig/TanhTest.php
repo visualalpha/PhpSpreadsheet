@@ -12,14 +12,14 @@ class TanhTest extends AllSetupTeardown
     public function testTanh($expectedResult, string $formula): void
     {
         $this->mightHaveException($expectedResult);
-        $sheet = $this->sheet;
+        $sheet = $this->getSheet();
         $sheet->setCellValue('A2', 1);
         $sheet->getCell('A1')->setValue("=TANH($formula)");
         $result = $sheet->getCell('A1')->getCalculatedValue();
         self::assertEqualsWithDelta($expectedResult, $result, 1E-6);
     }
 
-    public function providerTanh()
+    public function providerTanh(): array
     {
         return require 'tests/data/Calculation/MathTrig/TANH.php';
     }

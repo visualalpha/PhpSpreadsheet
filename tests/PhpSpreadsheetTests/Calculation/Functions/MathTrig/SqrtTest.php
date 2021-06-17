@@ -12,7 +12,7 @@ class SqrtTest extends AllSetupTeardown
      */
     public function testSQRT($expectedResult, $number = 'omitted'): void
     {
-        $sheet = $this->sheet;
+        $sheet = $this->getSheet();
         $this->mightHaveException($expectedResult);
         $this->setCell('A1', $number);
         if ($number === 'omitted') {
@@ -24,7 +24,7 @@ class SqrtTest extends AllSetupTeardown
         self::assertEqualsWithDelta($expectedResult, $result, 1E-6);
     }
 
-    public function providerSqrt()
+    public function providerSqrt(): array
     {
         return require 'tests/data/Calculation/MathTrig/SQRT.php';
     }

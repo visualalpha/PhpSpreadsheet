@@ -14,7 +14,7 @@ class QuotientTest extends AllSetupTeardown
     public function testQUOTIENT($expectedResult, $arg1 = 'omitted', $arg2 = 'omitted'): void
     {
         $this->mightHaveException($expectedResult);
-        $sheet = $this->sheet;
+        $sheet = $this->getSheet();
         if ($arg1 !== null) {
             $sheet->getCell('A1')->setValue($arg1);
         }
@@ -32,7 +32,7 @@ class QuotientTest extends AllSetupTeardown
         self::assertSame($expectedResult, $result);
     }
 
-    public function providerQUOTIENT()
+    public function providerQUOTIENT(): array
     {
         return require 'tests/data/Calculation/MathTrig/QUOTIENT.php';
     }
